@@ -270,7 +270,7 @@ export async function POST(req: Request) {
               passageId = newPassage.id;
             }
 
-            passageCache[normalizedPassage] = passageId;
+            passageCache[normalizedPassage] = passageId!;
           }
         }
 
@@ -304,7 +304,7 @@ export async function POST(req: Request) {
             if (groupInsertError) throw groupInsertError;
 
             groupId = newGroup.id;
-            groupCache[groupKey] = groupId;
+            groupCache[groupKey] = groupId!;
           }
         }
 
@@ -356,7 +356,7 @@ export async function POST(req: Request) {
 
             if (optionSetItemsInsertError) throw optionSetItemsInsertError;
 
-            optionSetCache[optionSetKey] = optionSetId;
+            optionSetCache[optionSetKey] = optionSetId!;
           }
         }
 
@@ -452,7 +452,7 @@ export async function POST(req: Request) {
                   tagId = newTag.id;
                 }
 
-                tagCache[tagKey] = tagId;
+                tagCache[tagKey] = tagId!;
               }
 
               const { error: questionTagInsertError } = await supabase
