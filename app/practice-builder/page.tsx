@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import HomeButton from "../../components/HomeButton";
 
 type ExamType = "cee" | "csat" | "toeic";
 type CountOption = 5 | 10 | 20;
@@ -110,6 +111,7 @@ export default function PracticeBuilderPage() {
     >
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
 
+        <HomeButton />
         {/* Header */}
         <div style={{ marginBottom: "32px" }}>
           <span

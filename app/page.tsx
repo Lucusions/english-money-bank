@@ -1,5 +1,29 @@
 import Link from "next/link";
 
+const CARDS = [
+  {
+    href: "/search",
+    icon: "🔍",
+    title: "題庫搜尋",
+    desc: "輸入關鍵字，即時搜尋單選題，預覽題目與答案。",
+    cta: "前往搜尋",
+  },
+  {
+    href: "/practice-builder",
+    icon: "✏️",
+    title: "開始練習",
+    desc: "隨機生成練習題組，即時作答並查看成績。",
+    cta: "開始練習",
+  },
+  {
+    href: "/quick-import",
+    icon: "📥",
+    title: "快速匯入",
+    desc: "貼上考試文字，自動解析題目並匯入題庫。",
+    cta: "前往匯入",
+  },
+];
+
 export default function Home() {
   return (
     <main
@@ -7,100 +31,141 @@ export default function Home() {
         minHeight: "100vh",
         background: "#f6f7fb",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "20px",
+        padding: "48px 20px 80px",
         fontFamily: "'Inter', 'Noto Sans TC', system-ui, sans-serif",
       }}
     >
-      <div
-        style={{
-          background: "#ffffff",
-          borderRadius: "20px",
-          padding: "52px 44px",
-          boxShadow: "0 4px 24px rgba(15, 23, 42, 0.08)",
-          textAlign: "center",
-          maxWidth: "420px",
-          width: "100%",
-        }}
-      >
+      {/* Hero */}
+      <div style={{ textAlign: "center", marginBottom: "52px" }}>
         <span
           style={{
             display: "inline-block",
             background: "#eff6ff",
             color: "#2563eb",
             fontSize: "12px",
-            fontWeight: 600,
+            fontWeight: 700,
             padding: "4px 12px",
             borderRadius: "999px",
-            letterSpacing: "0.06em",
+            letterSpacing: "0.07em",
             textTransform: "uppercase",
             marginBottom: "20px",
           }}
         >
           Beta
         </span>
-
         <h1
           style={{
-            fontSize: "28px",
-            fontWeight: 700,
+            fontSize: "36px",
+            fontWeight: 800,
             color: "#111827",
-            margin: "0 0 10px",
-            lineHeight: 1.3,
+            margin: "0 0 14px",
+            lineHeight: 1.25,
+            letterSpacing: "-0.02em",
           }}
         >
           英文題庫系統
         </h1>
-
         <p
           style={{
             color: "#6b7280",
-            fontSize: "15px",
-            margin: "0 0 36px",
+            fontSize: "17px",
+            margin: 0,
             lineHeight: 1.6,
           }}
         >
-          搜尋題目、隨機練習，逐步建立你的英文題庫平台。
+          建立、搜尋、練習你的英文題庫
         </p>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <Link
-            href="/search"
-            style={{
-              display: "block",
-              padding: "14px",
-              borderRadius: "12px",
-              background: "#2563eb",
-              color: "#ffffff",
-              fontSize: "15px",
-              fontWeight: 600,
-              textDecoration: "none",
-              transition: "background 0.15s",
-            }}
-          >
-            前往搜尋
-          </Link>
-
-          <Link
-            href="/practice-builder"
-            style={{
-              display: "block",
-              padding: "14px",
-              borderRadius: "12px",
-              background: "#ffffff",
-              color: "#2563eb",
-              fontSize: "15px",
-              fontWeight: 600,
-              textDecoration: "none",
-              border: "1.5px solid #2563eb",
-              transition: "background 0.15s",
-            }}
-          >
-            開始練習
-          </Link>
-        </div>
       </div>
+
+      {/* Cards */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: "20px",
+          width: "100%",
+          maxWidth: "860px",
+        }}
+      >
+        {CARDS.map((card) => (
+          <div
+            key={card.href}
+            style={{
+              background: "#ffffff",
+              borderRadius: "18px",
+              padding: "32px 28px",
+              boxShadow: "0 2px 12px rgba(15, 23, 42, 0.07)",
+              border: "1px solid #e5e7eb",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "32px",
+                marginBottom: "16px",
+                lineHeight: 1,
+              }}
+            >
+              {card.icon}
+            </div>
+            <h2
+              style={{
+                fontSize: "18px",
+                fontWeight: 700,
+                color: "#111827",
+                margin: "0 0 10px",
+              }}
+            >
+              {card.title}
+            </h2>
+            <p
+              style={{
+                color: "#6b7280",
+                fontSize: "14px",
+                margin: "0 0 24px",
+                lineHeight: 1.65,
+                flex: 1,
+              }}
+            >
+              {card.desc}
+            </p>
+            <Link
+              href={card.href}
+              style={{
+                display: "block",
+                padding: "11px 0",
+                borderRadius: "10px",
+                background: "#2563eb",
+                color: "#ffffff",
+                fontSize: "14px",
+                fontWeight: 600,
+                textDecoration: "none",
+                textAlign: "center",
+                letterSpacing: "0.01em",
+              }}
+            >
+              {card.cta}
+            </Link>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <p
+        style={{
+          marginTop: "52px",
+          color: "#d1d5db",
+          fontSize: "13px",
+          textAlign: "center",
+        }}
+      >
+        英文題庫系統 · Beta
+      </p>
     </main>
   );
 }

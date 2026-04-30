@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import HomeButton from "../../components/HomeButton";
 
 type PreviewItem = {
   type: string;
@@ -217,6 +218,7 @@ export default function QuickImportPage() {
       }}
     >
       <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <HomeButton />
         <h1
           style={{
             fontSize: "30px",

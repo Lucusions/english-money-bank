@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import HomeButton from "../../components/HomeButton";
 
 interface Option {
   id: string;
@@ -329,6 +330,7 @@ export default function PracticePage() {
     >
       <div style={{ maxWidth: "720px", margin: "0 auto" }}>
 
+        <HomeButton />
         {/* Progress bar */}
         <div style={{ marginBottom: "28px" }}>
           <div

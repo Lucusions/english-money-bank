@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import QuestionCard from "../../components/QuestionCard";
+import HomeButton from "../../components/HomeButton";
 
 export default function SearchPage() {
   const [keyword, setKeyword] = useState("");
@@ -45,6 +46,7 @@ export default function SearchPage() {
       <div style={{ maxWidth: "860px", margin: "0 auto" }}>
 
         {/* ── Header ── */}
+        <HomeButton />
         <div style={{ marginBottom: "32px" }}>
           <span
             style={{
