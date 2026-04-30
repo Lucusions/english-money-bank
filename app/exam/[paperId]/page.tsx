@@ -125,7 +125,7 @@ export default function ExamPage() {
       console.error(error)
       setItems([])
     } else {
-      setItems((data || []) as PaperItem[])
+      setItems((data || []) as unknown as PaperItem[])
     }
 
     setLoading(false)
