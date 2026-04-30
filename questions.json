@@ -1,0 +1,19 @@
+[
+  {
+    "question": {
+      "body": "She ___ to school.",
+      "type": "single",
+      "difficulty": "easy"
+    },
+    "options": [
+      { "text": "go", "is_correct": false },
+      { "text": "goes", "is_correct": true },
+      { "text": "went", "is_correct": false },
+      { "text": "going", "is_correct": false }
+    ],
+    "tags": [
+      { "name": "tenses", "category": "grammar" },
+      { "name": "會考", "category": "source" }
+    ]
+  }
+]
