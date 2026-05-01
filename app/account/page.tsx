@@ -87,8 +87,8 @@ export default function AccountPage() {
     );
   }
 
-  const role = profile?.role ?? "student";
   const teacherStatus = profile?.teacher_status ?? "none";
+  const role = teacherStatus === "approved" ? "teacher" : (profile?.role ?? "student");
 
   return (
     <main
