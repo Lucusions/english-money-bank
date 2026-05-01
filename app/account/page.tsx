@@ -37,6 +37,7 @@ export default function AccountPage() {
   const [profile, setProfile] = useState<any>(null);
   const [wallet, setWallet] = useState<any>(null);
   const [logoutHovered, setLogoutHovered] = useState(false);
+  const [applyHovered, setApplyHovered] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -185,28 +186,6 @@ export default function AccountPage() {
             </span>
           </div>
 
-          {role === "teacher" && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "14px",
-              }}
-            >
-              <span style={{ fontSize: "14px", color: "#6b7280" }}>老師審核狀態</span>
-              <span
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  color: "#374151",
-                }}
-              >
-                {TEACHER_STATUS_LABEL[teacherStatus] ?? teacherStatus}
-              </span>
-            </div>
-          )}
-
           <div
             style={{
               display: "flex",
@@ -219,6 +198,137 @@ export default function AccountPage() {
               {profile?.display_name || "（尚未設定）"}
             </span>
           </div>
+        </div>
+
+        {/* Teacher status card */}
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "16px",
+            padding: "24px",
+            boxShadow: "0 2px 10px rgba(15, 23, 42, 0.07)",
+            border: "1px solid #e5e7eb",
+            marginBottom: "16px",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "11px",
+              fontWeight: 700,
+              color: "#9ca3af",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              margin: "0 0 16px",
+            }}
+          >
+            老師申請
+          </p>
+
+          {teacherStatus === "none" && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+              <p style={{ margin: 0, fontSize: "14px", color: "#6b7280" }}>
+                尚未申請老師身份
+              </p>
+              <Link
+                href="/become-teacher"
+                onMouseEnter={() => setApplyHovered(true)}
+                onMouseLeave={() => setApplyHovered(false)}
+                style={{
+                  flexShrink: 0,
+                  display: "inline-block",
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  background: applyHovered ? "#6d28d9" : "#7c3aed",
+                  color: "#fff",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  transition: "background 0.15s",
+                  whiteSpace: "nowrap" as const,
+                }}
+              >
+                申請成為老師
+              </Link>
+            </div>
+          )}
+
+          {teacherStatus === "pending" && (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "18px" }}>⏳</span>
+              <div>
+                <p style={{ margin: 0, fontSize: "14px", fontWeight: 600, color: "#374151" }}>
+                  審核中
+                </p>
+                <p style={{ margin: "2px 0 0", fontSize: "13px", color: "#9ca3af" }}>
+                  管理員會盡快審核你的申請。
+                </p>
+              </div>
+            </div>
+          )}
+
+          {teacherStatus === "approved" && (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "18px" }}>🎓</span>
+              <div>
+                <p style={{ margin: 0, fontSize: "14px", fontWeight: 600, color: "#15803d" }}>
+                  已成為老師
+                </p>
+                <p style={{ margin: "2px 0 0", fontSize: "13px", color: "#9ca3af" }}>
+                  你的老師身份已通過審核。
+                </p>
+              </div>
+            </div>
+          )}
+
+          {teacherStatus === "rejected" && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ fontSize: "18px" }}>❌</span>
+                <div>
+                  <p style={{ margin: 0, fontSize: "14px", fontWeight: 600, color: "#dc2626" }}>
+                    申請未通過
+                  </p>
+                  <p style={{ margin: "2px 0 0", fontSize: "13px", color: "#9ca3af" }}>
+                    你可以修改自我介紹後重新申請。
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/become-teacher"
+                style={{
+                  flexShrink: 0,
+                  display: "inline-block",
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  background: "#fef2f2",
+                  color: "#dc2626",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  border: "1px solid #fca5a5",
+                  whiteSpace: "nowrap" as const,
+                }}
+              >
+                重新申請
+              </Link>
+            </div>
+          )}
+
+          {teacherStatus === "approved" && (
+            <div
+              style={{
+                marginTop: "14px",
+                padding: "12px",
+                borderRadius: "8px",
+                background: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+                fontSize: "13px",
+                color: "#15803d",
+              }}
+            >
+              ✓ 老師功能即將開放，敬請期待。
+            </div>
+          )}
         </div>
 
         {/* Wallet card */}
