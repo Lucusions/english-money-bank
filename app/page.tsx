@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AuthButton from "../components/AuthButton";
 
 const CARDS = [
   {
@@ -38,6 +39,7 @@ export default function Home() {
         fontFamily: "'Inter', 'Noto Sans TC', system-ui, sans-serif",
       }}
     >
+      <AuthButton />
       {/* Hero */}
       <div style={{ textAlign: "center", marginBottom: "52px" }}>
         <span

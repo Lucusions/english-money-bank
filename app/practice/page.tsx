@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import HomeButton from "../../components/HomeButton";
+import AuthButton from "../../components/AuthButton";
 
 interface Option {
   id: string;
@@ -61,6 +62,7 @@ export default function PracticePage() {
       <main
         style={{
           minHeight: "100vh",
+          position: "relative",
           background: "#f6f7fb",
           display: "flex",
           alignItems: "center",
@@ -69,6 +71,7 @@ export default function PracticePage() {
           padding: "20px",
         }}
       >
+        <AuthButton />
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: "48px", marginBottom: "16px" }}>📋</div>
           <p
@@ -218,6 +221,7 @@ export default function PracticePage() {
           fontFamily: "'Inter', 'Noto Sans TC', system-ui, sans-serif",
         }}
       >
+        <AuthButton />
         <div style={{ maxWidth: "640px", margin: "0 auto" }}>
 
           {/* Score card */}
@@ -331,6 +335,7 @@ export default function PracticePage() {
       <div style={{ maxWidth: "720px", margin: "0 auto" }}>
 
         <HomeButton />
+        <AuthButton />
         {/* Progress bar */}
         <div style={{ marginBottom: "28px" }}>
           <div

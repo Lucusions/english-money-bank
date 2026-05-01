@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import HomeButton from "../../components/HomeButton";
+import AuthButton from "../../components/AuthButton";
 
 type PreviewItem = {
   type: string;
@@ -219,6 +220,7 @@ export default function QuickImportPage() {
     >
       <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
         <HomeButton />
+        <AuthButton />
         <h1
           style={{
             fontSize: "30px",

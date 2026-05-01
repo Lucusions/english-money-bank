@@ -3,6 +3,7 @@
 import { useState } from "react";
 import QuestionCard from "../../components/QuestionCard";
 import HomeButton from "../../components/HomeButton";
+import AuthButton from "../../components/AuthButton";
 
 export default function SearchPage() {
   const [keyword, setKeyword] = useState("");
@@ -47,6 +48,7 @@ export default function SearchPage() {
 
         {/* ── Header ── */}
         <HomeButton />
+        <AuthButton />
         <div style={{ marginBottom: "32px" }}>
           <span
             style={{
