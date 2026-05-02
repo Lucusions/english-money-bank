@@ -74,7 +74,9 @@ export default function QuestionTagSelector({ questionId }: Props) {
         next.delete(key);
         return next;
       });
-      setError(json.error || "儲存失敗");
+      // Show the real DB error so users/devs can see what failed
+      const msg = json.detail || json.error || "儲存失敗";
+      setError(msg);
       return;
     }
 

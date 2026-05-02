@@ -23,79 +23,90 @@ const WHITELIST = new Set([
   "難度::困難",
 ]);
 
+// Returns tag id, or null + the actual error string so callers can surface it
 async function findOrCreateTag(
   name: string,
   category: string
-): Promise<string | null> {
-  // Try to find existing tag
-  const { data: existing, error: selectErr } = await supabase
+): Promise<{ id: string | null; err: string | null }> {
+  // 1. Try to find
+  const { data: existing, error: selErr } = await supabase
     .from("tags")
     .select("id")
     .eq("name", name)
     .eq("category", category)
     .maybeSingle();
 
-  if (selectErr) {
-    console.error("[tags] select error:", selectErr.message);
-    return null;
+  if (selErr) {
+    console.error("[tags] SELECT failed:", selErr);
+    return { id: null, err: `tags.select: ${selErr.message} (${selErr.code})` };
   }
-  if (existing) return existing.id as string;
+  if (existing) return { id: existing.id as string, err: null };
 
-  // Insert new tag
-  const { data: created, error: insertErr } = await supabase
+  // 2. Insert
+  const { data: created, error: insErr } = await supabase
     .from("tags")
     .insert({ name, category })
     .select("id")
     .maybeSingle();
 
-  if (created) return created.id as string;
+  if (created) return { id: created.id as string, err: null };
 
-  // Race condition — another request inserted first, retry select
-  if (insertErr) {
-    const { data: retry } = await supabase
-      .from("tags")
-      .select("id")
-      .eq("name", name)
-      .eq("category", category)
-      .maybeSingle();
-    if (retry) return retry.id as string;
-    console.error("[tags] insert+retry failed:", insertErr.message);
+  if (insErr) {
+    console.error("[tags] INSERT failed:", insErr);
+
+    // Unique-violation means concurrent insert won the race; retry select
+    if (insErr.code === "23505") {
+      const { data: retry } = await supabase
+        .from("tags")
+        .select("id")
+        .eq("name", name)
+        .eq("category", category)
+        .maybeSingle();
+      if (retry) return { id: retry.id as string, err: null };
+    }
+
+    return { id: null, err: `tags.insert: ${insErr.message} (${insErr.code})` };
   }
 
-  return null;
+  return { id: null, err: "tags.insert: no data returned" };
 }
 
+// Returns ok + actual error string so callers can surface it
 async function linkTagToQuestion(
   questionId: string,
   tagId: string
-): Promise<boolean> {
-  // Check first — avoids needing a unique constraint for dedup
-  const { data: existing } = await supabase
+): Promise<{ ok: boolean; err: string | null }> {
+  // Check if already linked
+  const { data: existing, error: selErr } = await supabase
     .from("question_tags")
     .select("question_id")
     .eq("question_id", questionId)
     .eq("tag_id", tagId)
     .maybeSingle();
 
-  if (existing) return true; // already linked
+  if (selErr) {
+    console.error("[question_tags] SELECT failed:", selErr);
+    return { ok: false, err: `question_tags.select: ${selErr.message} (${selErr.code})` };
+  }
+  if (existing) return { ok: true, err: null }; // already linked, fine
 
-  const { error: insertErr } = await supabase
+  // Insert
+  const { error: insErr } = await supabase
     .from("question_tags")
     .insert({ question_id: questionId, tag_id: tagId });
 
-  if (insertErr) {
-    // 23505 = unique_violation — concurrent request got there first, still fine
-    if (insertErr.code === "23505") return true;
-    console.error(
-      "[question_tags] insert error:",
-      insertErr.message,
-      "code:",
-      insertErr.code
-    );
-    return false;
+  if (insErr) {
+    console.error("[question_tags] INSERT failed:", insErr);
+    // 23505 = unique_violation (concurrent request beat us here)
+    if (insErr.code === "23505") return { ok: true, err: null };
+    return {
+      ok: false,
+      err: `question_tags.insert: ${insErr.message} (${insErr.code})`,
+    };
   }
 
-  return true;
+  console.log("[question_tags] inserted question_id:", questionId, "tag_id:", tagId);
+  return { ok: true, err: null };
 }
 
 async function getTagsForQuestion(
@@ -107,7 +118,7 @@ async function getTagsForQuestion(
     .eq("question_id", questionId);
 
   if (qtErr) {
-    console.error("[question_tags] select error:", qtErr.message);
+    console.error("[question_tags] SELECT error:", qtErr);
     return [];
   }
   if (!qtRows || qtRows.length === 0) return [];
@@ -120,7 +131,7 @@ async function getTagsForQuestion(
     .in("id", tagIds);
 
   if (tagsErr) {
-    console.error("[tags] select error:", tagsErr.message);
+    console.error("[tags] SELECT error:", tagsErr);
     return [];
   }
 
@@ -138,18 +149,23 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // ── Auth ────────────────────────────────────────────────────
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser(
-    authHeader.slice(7)
-  );
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser(authHeader.slice(7));
+
   if (authError || !user) {
+    console.error("[question-tags] auth failed:", authError);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // ── Parse body ───────────────────────────────────────────────
   let body: { question_id?: string; tags?: { name: string; category: string }[] };
   try {
     body = await req.json();
@@ -158,39 +174,63 @@ export async function POST(req: NextRequest) {
   }
 
   const { question_id, tags } = body;
+  console.log("[question-tags] POST user:", user.id, "question_id:", question_id, "tags:", tags);
+
   if (!question_id || !Array.isArray(tags) || tags.length === 0) {
-    return NextResponse.json(
-      { error: "Missing question_id or tags" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing question_id or tags" }, { status: 400 });
   }
 
+  // ── Whitelist ────────────────────────────────────────────────
   const allowed = tags.filter((t) => WHITELIST.has(`${t.category}::${t.name}`));
   if (allowed.length === 0) {
     return NextResponse.json({ error: "No valid tags" }, { status: 400 });
   }
 
-  const failures: string[] = [];
-
-  for (const tag of allowed) {
-    const tagId = await findOrCreateTag(tag.name, tag.category);
-    if (!tagId) {
-      failures.push(`${tag.category}::${tag.name}`);
-      continue;
-    }
-
-    const ok = await linkTagToQuestion(question_id, tagId);
-    if (!ok) failures.push(`link:${tag.category}::${tag.name}`);
-  }
-
-  const updatedTags = await getTagsForQuestion(question_id);
-
-  if (failures.length > 0 && updatedTags.length === 0) {
+  // ── Sanity-check table access ────────────────────────────────
+  const { error: tagsCheck } = await supabase.from("tags").select("id").limit(1);
+  if (tagsCheck) {
+    console.error("[question-tags] tags table not accessible:", tagsCheck);
     return NextResponse.json(
-      { error: "Failed to save tags", details: failures },
+      { error: "Cannot access tags table", detail: tagsCheck.message, code: tagsCheck.code },
       { status: 500 }
     );
   }
 
-  return NextResponse.json({ tags: updatedTags });
+  const { error: qtCheck } = await supabase.from("question_tags").select("question_id").limit(1);
+  if (qtCheck) {
+    console.error("[question-tags] question_tags table not accessible:", qtCheck);
+    return NextResponse.json(
+      { error: "Cannot access question_tags table", detail: qtCheck.message, code: qtCheck.code },
+      { status: 500 }
+    );
+  }
+
+  // ── Process tags ─────────────────────────────────────────────
+  const dbErrors: string[] = [];
+
+  for (const tag of allowed) {
+    const { id: tagId, err: tagErr } = await findOrCreateTag(tag.name, tag.category);
+
+    if (!tagId) {
+      dbErrors.push(tagErr ?? `findOrCreateTag returned null for ${tag.category}::${tag.name}`);
+      continue;
+    }
+
+    const { ok, err: linkErr } = await linkTagToQuestion(question_id, tagId);
+    if (!ok) {
+      dbErrors.push(linkErr ?? `linkTagToQuestion failed for tagId=${tagId}`);
+    }
+  }
+
+  const updatedTags = await getTagsForQuestion(question_id);
+  console.log("[question-tags] result — tags:", updatedTags.length, "errors:", dbErrors);
+
+  if (dbErrors.length > 0 && updatedTags.length === 0) {
+    return NextResponse.json(
+      { error: "Failed to save tags", detail: dbErrors[0], all: dbErrors },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ success: true, tags: updatedTags });
 }
