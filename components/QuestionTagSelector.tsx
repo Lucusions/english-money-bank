@@ -68,7 +68,7 @@ export default function QuestionTagSelector({ questionId }: Props) {
     setSaving(null);
 
     if (!res.ok) {
-      // Rollback optimistic update
+      // Rollback optimistic update — server rejected or errored
       setSavedKeys((prev) => {
         const next = new Set(prev);
         next.delete(key);
@@ -78,13 +78,21 @@ export default function QuestionTagSelector({ questionId }: Props) {
       return;
     }
 
-    // Sync with server's authoritative list (replaces optimistic state)
+    // Always sync from server's authoritative list.
+    // If server returns empty something went wrong — rollback so the user isn't misled.
     if (Array.isArray(json.tags) && json.tags.length > 0) {
       setSavedKeys(
-        new Set((json.tags as any[]).map((t) => `${t.category}::${t.name}`))
+        new Set((json.tags as any[]).map((t: any) => `${t.category}::${t.name}`))
       );
+    } else {
+      // Unexpected empty response — rollback
+      setSavedKeys((prev) => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
+      setError("儲存失敗，請重試");
     }
-    // If server returns empty (edge case), keep optimistic state as-is
   }
 
   // Don't render anything while auth state is loading to avoid flicker
