@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import HomeButton from "../../components/HomeButton";
 import AuthButton from "../../components/AuthButton";
+import QuestionTagSelector from "../../components/QuestionTagSelector";
 
 interface Option {
   id: string;
@@ -480,6 +481,9 @@ export default function PracticePage() {
                 : "✗ 答錯了，正確答案已標示"}
             </div>
           )}
+
+          {/* Student tagging */}
+          <QuestionTagSelector questionId={current.id} />
         </div>
 
         {/* Next / Finish button */}
