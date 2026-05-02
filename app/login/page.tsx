@@ -184,17 +184,25 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "13px",
-                fontWeight: 600,
-                color: "#374151",
-                marginBottom: "6px",
-              }}
-            >
-              密碼
-            </label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "6px" }}>
+              <label
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: "#374151",
+                }}
+              >
+                密碼
+              </label>
+              {mode === "login" && (
+                <Link
+                  href="/forgot-password"
+                  style={{ fontSize: "12px", color: "#6b7280", textDecoration: "none" }}
+                >
+                  忘記密碼？
+                </Link>
+              )}
+            </div>
             <input
               type="password"
               value={password}
