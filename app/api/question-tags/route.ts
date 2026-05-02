@@ -6,21 +6,22 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+// Keys must match the English enum values accepted by the tags.category column
 const WHITELIST = new Set([
-  "題型::單選",
-  "題型::閱讀",
-  "題型::克漏字",
-  "題型::文法",
-  "題型::單字",
-  "考試::會考",
-  "考試::學測",
-  "考試::TOEIC",
-  "字彙級別::2000單",
-  "字彙級別::4000單",
-  "字彙級別::7000單",
-  "難度::簡單",
-  "難度::中等",
-  "難度::困難",
+  "source::單選",
+  "reading::閱讀",
+  "reading::克漏字",
+  "grammar::文法",
+  "vocabulary::單字",
+  "source::會考",
+  "source::學測",
+  "source::TOEIC",
+  "level::2000單",
+  "level::4000單",
+  "level::7000單",
+  "level::簡單",
+  "level::中等",
+  "level::困難",
 ]);
 
 // Returns tag id, or null + the actual error string so callers can surface it

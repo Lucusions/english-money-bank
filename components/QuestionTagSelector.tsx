@@ -3,11 +3,45 @@
 import { useState, useEffect } from "react";
 import { getSupabaseBrowser } from "../lib/supabase-browser";
 
-const CATEGORIES: { key: string; label: string; tags: string[] }[] = [
-  { key: "題型",   label: "題型",   tags: ["單選", "閱讀", "克漏字", "文法", "單字"] },
-  { key: "考試",   label: "考試",   tags: ["會考", "學測", "TOEIC"] },
-  { key: "字彙級別", label: "字彙級別", tags: ["2000單", "4000單", "7000單"] },
-  { key: "難度",   label: "難度",   tags: ["簡單", "中等", "困難"] },
+// Display label (Chinese) + per-tag API category (English enum)
+const CATEGORIES: {
+  label: string;
+  items: { name: string; category: string }[];
+}[] = [
+  {
+    label: "題型",
+    items: [
+      { name: "單選",  category: "source"     },
+      { name: "閱讀",  category: "reading"    },
+      { name: "克漏字", category: "reading"   },
+      { name: "文法",  category: "grammar"    },
+      { name: "單字",  category: "vocabulary" },
+    ],
+  },
+  {
+    label: "考試",
+    items: [
+      { name: "會考",  category: "source" },
+      { name: "學測",  category: "source" },
+      { name: "TOEIC", category: "source" },
+    ],
+  },
+  {
+    label: "字彙級別",
+    items: [
+      { name: "2000單", category: "level" },
+      { name: "4000單", category: "level" },
+      { name: "7000單", category: "level" },
+    ],
+  },
+  {
+    label: "難度",
+    items: [
+      { name: "簡單", category: "level" },
+      { name: "中等", category: "level" },
+      { name: "困難", category: "level" },
+    ],
+  },
 ];
 
 interface Props {
@@ -23,7 +57,6 @@ export default function QuestionTagSelector({ questionId }: Props) {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
   useEffect(() => {
-    // Clear stale chips immediately when question changes (important for /practice nav)
     setSavedKeys(new Set());
 
     async function load() {
@@ -35,6 +68,7 @@ export default function QuestionTagSelector({ questionId }: Props) {
       const res = await fetch(`/api/question-tags?question_id=${questionId}`);
       if (res.ok) {
         const json = await res.json();
+        // keys are "englishCategory::name", matching what we build below
         setSavedKeys(
           new Set((json.tags ?? []).map((t: any) => `${t.category}::${t.name}`))
         );
@@ -47,7 +81,6 @@ export default function QuestionTagSelector({ questionId }: Props) {
     const key = `${category}::${name}`;
     if (savedKeys.has(key) || saving === key || !accessToken) return;
 
-    // Optimistic update — show chip as selected immediately
     setSavedKeys((prev) => new Set([...prev, key]));
     setSaving(key);
     setError("");
@@ -60,7 +93,7 @@ export default function QuestionTagSelector({ questionId }: Props) {
       },
       body: JSON.stringify({
         question_id: questionId,
-        tags: [{ name, category }],
+        tags: [{ name, category }],   // English category goes to DB
       }),
     });
 
@@ -68,26 +101,20 @@ export default function QuestionTagSelector({ questionId }: Props) {
     setSaving(null);
 
     if (!res.ok) {
-      // Rollback optimistic update — server rejected or errored
       setSavedKeys((prev) => {
         const next = new Set(prev);
         next.delete(key);
         return next;
       });
-      // Show the real DB error so users/devs can see what failed
-      const msg = json.detail || json.error || "儲存失敗";
-      setError(msg);
+      setError(json.detail || json.error || "儲存失敗");
       return;
     }
 
-    // Always sync from server's authoritative list.
-    // If server returns empty something went wrong — rollback so the user isn't misled.
     if (Array.isArray(json.tags) && json.tags.length > 0) {
       setSavedKeys(
         new Set((json.tags as any[]).map((t: any) => `${t.category}::${t.name}`))
       );
     } else {
-      // Unexpected empty response — rollback
       setSavedKeys((prev) => {
         const next = new Set(prev);
         next.delete(key);
@@ -97,7 +124,6 @@ export default function QuestionTagSelector({ questionId }: Props) {
     }
   }
 
-  // Don't render anything while auth state is loading to avoid flicker
   if (loggedIn === null) return null;
 
   return (
@@ -136,8 +162,11 @@ export default function QuestionTagSelector({ questionId }: Props) {
       ) : (
         <div>
           <div style={{ display: "grid", gap: "10px" }}>
-            {CATEGORIES.map(({ key, label, tags }) => (
-              <div key={key} style={{ display: "flex", alignItems: "baseline", gap: "8px", flexWrap: "wrap" }}>
+            {CATEGORIES.map(({ label, items }) => (
+              <div
+                key={label}
+                style={{ display: "flex", alignItems: "baseline", gap: "8px", flexWrap: "wrap" }}
+              >
                 <span
                   style={{
                     fontSize: "11px",
@@ -150,16 +179,16 @@ export default function QuestionTagSelector({ questionId }: Props) {
                   {label}
                 </span>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                  {tags.map((name) => {
-                    const tagKey = `${key}::${name}`;
+                  {items.map(({ name, category }) => {
+                    const tagKey = `${category}::${name}`;
                     const selected = savedKeys.has(tagKey);
                     const isSaving = saving === tagKey;
                     const hovered = hoveredKey === tagKey;
 
                     return (
                       <button
-                        key={name}
-                        onClick={() => handleClick(name, key)}
+                        key={tagKey}
+                        onClick={() => handleClick(name, category)}
                         onMouseEnter={() => !selected && setHoveredKey(tagKey)}
                         onMouseLeave={() => setHoveredKey(null)}
                         disabled={selected || isSaving}
