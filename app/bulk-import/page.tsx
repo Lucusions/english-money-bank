@@ -8,50 +8,38 @@ interface FailedItem {
   error: string;
 }
 
-type Status = "idle" | "valid" | "invalid" | "importing" | "done" | "error";
+type Status = "idle" | "importing" | "done" | "error";
 
 export default function BulkImportPage() {
   const [raw, setRaw] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [parseError, setParseError] = useState("");
-  const [parsed, setParsed] = useState<unknown[] | null>(null);
   const [insertedCount, setInsertedCount] = useState(0);
   const [failed, setFailed] = useState<FailedItem[]>([]);
   const [apiError, setApiError] = useState("");
-  const [textareaFocused, setTextareaFocused] = useState(false);
+  const [focused, setFocused] = useState(false);
 
-  function handleValidate() {
+  async function handleImport() {
     setParseError("");
     setApiError("");
     setFailed([]);
+
+    let parsed: unknown[];
     try {
       const data = JSON.parse(raw);
-      if (!Array.isArray(data)) {
-        setParseError("JSON 必須是陣列 [ ... ]");
-        setStatus("invalid");
-        setParsed(null);
+      if (!Array.isArray(data) || data.length === 0) {
+        setParseError("JSON 必須是非空陣列 [ ... ]");
+        setStatus("error");
         return;
       }
-      if (data.length === 0) {
-        setParseError("陣列不能為空");
-        setStatus("invalid");
-        setParsed(null);
-        return;
-      }
-      setParsed(data);
-      setStatus("valid");
-    } catch (e: any) {
-      setParseError(e.message || "JSON 格式錯誤");
-      setStatus("invalid");
-      setParsed(null);
+      parsed = data;
+    } catch (e: unknown) {
+      setParseError(e instanceof Error ? e.message : "JSON 格式錯誤");
+      setStatus("error");
+      return;
     }
-  }
 
-  async function handleImport() {
-    if (!parsed) return;
     setStatus("importing");
-    setApiError("");
-    setFailed([]);
 
     try {
       const res = await fetch("/api/bulk-import", {
@@ -70,13 +58,12 @@ export default function BulkImportPage() {
       setInsertedCount(json.inserted_questions ?? 0);
       setFailed(json.failed ?? []);
       setStatus("done");
-    } catch (e: any) {
-      setApiError(e.message || "網路錯誤");
+    } catch (e: unknown) {
+      setApiError(e instanceof Error ? e.message : "網路錯誤");
       setStatus("error");
     }
   }
 
-  const canImport = status === "valid" && parsed !== null;
   const isImporting = status === "importing";
 
   return (
@@ -89,17 +76,12 @@ export default function BulkImportPage() {
       }}
     >
       <div style={{ maxWidth: "720px", margin: "0 auto" }}>
-        {/* Back */}
         <div style={{ marginBottom: "24px" }}>
-          <Link
-            href="/"
-            style={{ color: "#9ca3af", fontSize: "13px", textDecoration: "none" }}
-          >
+          <Link href="/" style={{ color: "#9ca3af", fontSize: "13px", textDecoration: "none" }}>
             ← 回首頁
           </Link>
         </div>
 
-        {/* Header */}
         <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#111827", margin: "0 0 6px" }}>
           批次匯入題目
         </h1>
@@ -107,7 +89,6 @@ export default function BulkImportPage() {
           貼上 JSON 陣列，每個物件包含 question、options、tags
         </p>
 
-        {/* Textarea */}
         <div style={{ marginBottom: "16px" }}>
           <label
             style={{
@@ -125,18 +106,17 @@ export default function BulkImportPage() {
             onChange={(e) => {
               setRaw(e.target.value);
               setStatus("idle");
-              setParsed(null);
               setParseError("");
             }}
-            onFocus={() => setTextareaFocused(true)}
-            onBlur={() => setTextareaFocused(false)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
             placeholder={`[\n  {\n    "question": { "body": "He ____ finished his work.", "difficulty": "easy" },\n    "options": [\n      { "text": "have", "is_correct": false },\n      { "text": "has", "is_correct": true }\n    ],\n    "tags": [{ "name": "文法", "category": "grammar" }]\n  }\n]`}
             rows={18}
             style={{
               width: "100%",
               padding: "14px",
               borderRadius: "12px",
-              border: textareaFocused ? "1.5px solid #2563eb" : "1.5px solid #d1d5db",
+              border: focused ? "1.5px solid #2563eb" : "1.5px solid #d1d5db",
               background: "#ffffff",
               fontSize: "13px",
               fontFamily: "'Fira Code', 'Courier New', monospace",
@@ -145,70 +125,33 @@ export default function BulkImportPage() {
               resize: "vertical",
               boxSizing: "border-box",
               lineHeight: 1.6,
-              boxShadow: textareaFocused ? "0 0 0 3px rgba(37,99,235,0.08)" : "none",
+              boxShadow: focused ? "0 0 0 3px rgba(37,99,235,0.08)" : "none",
               transition: "border-color 0.15s, box-shadow 0.15s",
             }}
           />
         </div>
 
-        {/* Buttons */}
-        <div style={{ display: "flex", gap: "10px", marginBottom: "20px", flexWrap: "wrap" }}>
-          <button
-            onClick={handleValidate}
-            disabled={!raw.trim() || isImporting}
-            style={{
-              padding: "10px 20px",
-              borderRadius: "10px",
-              border: "1.5px solid #d1d5db",
-              background: "#ffffff",
-              color: "#374151",
-              fontSize: "14px",
-              fontWeight: 600,
-              cursor: !raw.trim() || isImporting ? "not-allowed" : "pointer",
-              opacity: !raw.trim() || isImporting ? 0.5 : 1,
-              transition: "opacity 0.15s",
-            }}
-          >
-            驗證 JSON
-          </button>
-
+        <div style={{ marginBottom: "20px" }}>
           <button
             onClick={handleImport}
-            disabled={!canImport || isImporting}
+            disabled={!raw.trim() || isImporting}
             style={{
-              padding: "10px 20px",
+              padding: "10px 24px",
               borderRadius: "10px",
               border: "none",
-              background: !canImport || isImporting ? "#93c5fd" : "#2563eb",
+              background: !raw.trim() || isImporting ? "#93c5fd" : "#2563eb",
               color: "#ffffff",
               fontSize: "14px",
               fontWeight: 700,
-              cursor: !canImport || isImporting ? "not-allowed" : "pointer",
+              cursor: !raw.trim() || isImporting ? "not-allowed" : "pointer",
               transition: "background 0.15s",
             }}
           >
-            {isImporting ? "匯入中…" : "匯入資料"}
+            {isImporting ? "匯入中…" : "匯入"}
           </button>
         </div>
 
-        {/* Validation feedback */}
-        {status === "valid" && parsed && (
-          <div
-            style={{
-              background: "#f0fdf4",
-              border: "1px solid #86efac",
-              borderRadius: "10px",
-              padding: "12px 16px",
-              color: "#15803d",
-              fontSize: "14px",
-              marginBottom: "16px",
-            }}
-          >
-            ✓ JSON 格式正確，共 {parsed.length} 題，可以匯入
-          </div>
-        )}
-
-        {status === "invalid" && parseError && (
+        {(parseError || apiError) && (
           <div
             style={{
               background: "#fef2f2",
@@ -220,11 +163,10 @@ export default function BulkImportPage() {
               marginBottom: "16px",
             }}
           >
-            ✗ {parseError}
+            ✗ {parseError || apiError}
           </div>
         )}
 
-        {/* Import result */}
         {status === "done" && (
           <div
             style={{
@@ -273,23 +215,6 @@ export default function BulkImportPage() {
           </div>
         )}
 
-        {(status === "error" && apiError) && (
-          <div
-            style={{
-              background: "#fef2f2",
-              border: "1px solid #fca5a5",
-              borderRadius: "10px",
-              padding: "12px 16px",
-              color: "#dc2626",
-              fontSize: "14px",
-              marginBottom: "16px",
-            }}
-          >
-            ✗ {apiError}
-          </div>
-        )}
-
-        {/* Schema hint */}
         <details style={{ marginTop: "24px" }}>
           <summary
             style={{
