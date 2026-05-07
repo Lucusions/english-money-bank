@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "../components/Navbar";
 import { getSupabaseBrowser } from "../lib/supabase-browser";
 
@@ -81,108 +82,134 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section
         style={{
-          background: "linear-gradient(150deg, #131c35 0%, #1e2a4a 45%, #1a3558 100%)",
-          minHeight: "100vh",
+          position: "relative",
+          minHeight: "92vh",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          textAlign: "center",
-          padding: "120px 24px 100px",
-          position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Decorative rings */}
-        <div style={ring(480, "top: 8%; right: -80px", 0.12)} />
-        <div style={ring(320, "top: 14%; right: -20px", 0.07)} />
-        <div style={ring(360, "bottom: 4%; left: -100px", 0.06)} />
-        <div style={ring(220, "bottom: 10%; left: -40px", 0.09)} />
+        {/* Background photo */}
+        <Image
+          src="/school.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectFit: "cover", objectPosition: "center 40%" }}
+        />
 
-        {/* Eyebrow badge */}
+        {/* Cinematic overlay */}
         <div
           style={{
-            display: "inline-flex",
+            position: "absolute",
+            inset: 0,
+            zIndex: 1,
+            background:
+              "linear-gradient(180deg, rgba(12,18,38,0.74) 0%, rgba(12,18,38,0.50) 38%, rgba(12,18,38,0.62) 68%, rgba(12,18,38,0.82) 100%)",
+          }}
+        />
+
+        {/* Hero content */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 2,
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            gap: "8px",
-            background: "rgba(201, 168, 76, 0.12)",
-            border: "1px solid rgba(201, 168, 76, 0.28)",
-            borderRadius: "999px",
-            padding: "6px 18px",
-            marginBottom: "36px",
+            textAlign: "center",
+            padding: "128px 24px 100px",
           }}
         >
-          <span
+          {/* Eyebrow badge */}
+          <div
             style={{
-              width: "6px",
-              height: "6px",
-              borderRadius: "50%",
-              background: "#c9a84c",
-              display: "inline-block",
-              flexShrink: 0,
-            }}
-          />
-          <span
-            style={{
-              color: "#c9a84c",
-              fontSize: "12px",
-              fontWeight: 700,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              background: "rgba(201, 168, 76, 0.12)",
+              border: "1px solid rgba(201, 168, 76, 0.28)",
+              borderRadius: "999px",
+              padding: "6px 18px",
+              marginBottom: "36px",
             }}
           >
-            英文備考平台 · Beta
-          </span>
-        </div>
+            <span
+              style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "50%",
+                background: "#c9a84c",
+                display: "inline-block",
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                color: "#c9a84c",
+                fontSize: "12px",
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}
+            >
+              英文備考平台 · Beta
+            </span>
+          </div>
 
-        {/* Heading */}
-        <h1
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "clamp(36px, 6.5vw, 76px)",
-            fontWeight: 700,
-            color: "#ffffff",
-            lineHeight: 1.12,
-            marginBottom: "28px",
-            letterSpacing: "-0.025em",
-            maxWidth: "820px",
-          }}
-        >
-          精準備考，
-          <br />
-          <span style={{ color: "#c9a84c" }}>輕鬆突破</span>英文瓶頸
-        </h1>
+          {/* Heading */}
+          <h1
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(36px, 6.5vw, 76px)",
+              fontWeight: 700,
+              color: "#ffffff",
+              lineHeight: 1.12,
+              marginBottom: "28px",
+              letterSpacing: "-0.025em",
+              maxWidth: "820px",
+            }}
+          >
+            精準備考，
+            <br />
+            <span style={{ color: "#c9a84c" }}>輕鬆突破</span>英文瓶頸
+          </h1>
 
-        {/* Subtitle */}
-        <p
-          style={{
-            color: "rgba(255, 255, 255, 0.65)",
-            fontSize: "18px",
-            lineHeight: 1.75,
-            maxWidth: "520px",
-            marginBottom: "48px",
-          }}
-        >
-          海量精選題庫，搭配閱讀題組與老師詳解，
-          <br />
-          從單字到閱讀理解，一站式提升英文實力。
-        </p>
+          {/* Subtitle */}
+          <p
+            style={{
+              color: "rgba(255, 255, 255, 0.80)",
+              fontSize: "18px",
+              lineHeight: 1.75,
+              maxWidth: "520px",
+              marginBottom: "48px",
+            }}
+          >
+            海量精選題庫，搭配閱讀題組與老師詳解，
+            <br />
+            從單字到閱讀理解，一站式提升英文實力。
+          </p>
 
-        {/* CTA Buttons */}
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
-          <HeroBtn href="/search" primary>
-            開始搜尋題庫
-          </HeroBtn>
-          <HeroBtn href="/practice-builder">
-            探索練習模式
-          </HeroBtn>
+          {/* CTA Buttons */}
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              flexWrap: "wrap",
+              justifyContent: "center",
+            }}
+          >
+            <HeroBtn href="/search" primary>
+              開始搜尋題庫
+            </HeroBtn>
+            <HeroBtn href="/practice-builder">
+              探索練習模式
+            </HeroBtn>
+          </div>
         </div>
 
         {/* Scroll hint */}
@@ -192,6 +219,7 @@ export default function HomePage() {
             bottom: "36px",
             left: "50%",
             transform: "translateX(-50%)",
+            zIndex: 2,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -682,24 +710,3 @@ function HeroBtn({
   );
 }
 
-/* helper: decorative ring style */
-function ring(
-  size: number,
-  position: string,
-  opacity: number
-): React.CSSProperties {
-  const pos: Record<string, string> = {};
-  position.split("; ").forEach((p) => {
-    const [k, v] = p.split(": ");
-    pos[k.trim()] = v.trim();
-  });
-  return {
-    position: "absolute",
-    width: `${size}px`,
-    height: `${size}px`,
-    borderRadius: "50%",
-    border: `1px solid rgba(201, 168, 76, ${opacity})`,
-    pointerEvents: "none",
-    ...pos,
-  };
-}
