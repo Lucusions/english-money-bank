@@ -8,26 +8,35 @@ import { getSupabaseBrowser } from "../../lib/supabase-browser";
 const ROLE_LABEL: Record<string, string> = {
   student: "學生",
   teacher: "老師",
-  admin: "管理員",
+  admin:   "管理員",
 };
 
-const ROLE_COLOR: Record<string, string> = {
-  student: "#2563eb",
-  teacher: "#7c3aed",
-  admin: "#dc2626",
-};
-
-const ROLE_BG: Record<string, string> = {
-  student: "#eff6ff",
-  teacher: "#f5f3ff",
-  admin: "#fef2f2",
+const ROLE_STYLE: Record<string, { bg: string; color: string; border: string }> = {
+  student: { bg: "#f0ede8",  color: "#1e2a4a",  border: "#e8e4df" },
+  teacher: { bg: "#f5f3ff",  color: "#7c3aed",  border: "#ede9fe" },
+  admin:   { bg: "#fef2f2",  color: "#dc2626",  border: "#fca5a5" },
 };
 
 const TEACHER_STATUS_LABEL: Record<string, string> = {
-  none: "尚未申請",
-  pending: "審核中",
+  none:     "尚未申請",
+  pending:  "審核中",
   approved: "已通過",
   rejected: "未通過",
+};
+
+const SECTION_LABEL: React.CSSProperties = {
+  fontSize: "11px",
+  fontWeight: 700,
+  color: "#8896a4",
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  margin: "0 0 18px",
+};
+
+const INFO_ROW: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
 };
 
 export default function AccountPage() {
@@ -43,12 +52,7 @@ export default function AccountPage() {
     async function load() {
       const supabase = getSupabaseBrowser();
       const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/login");
-        return;
-      }
-
+      if (!user) { router.push("/login"); return; }
       setUser(user);
 
       const [profileRes, walletRes] = await Promise.all([
@@ -60,7 +64,6 @@ export default function AccountPage() {
       setWallet(walletRes.data);
       setLoading(false);
     }
-
     load();
   }, [router]);
 
@@ -75,28 +78,34 @@ export default function AccountPage() {
       <main
         style={{
           minHeight: "100vh",
-          background: "#f6f7fb",
+          background: "#faf8f5",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "'Inter', 'Noto Sans TC', system-ui, sans-serif",
+          fontFamily: "var(--font-body)",
         }}
       >
-        <p style={{ color: "#9ca3af", fontSize: "15px" }}>載入中…</p>
+        <p style={{ color: "#8896a4", fontSize: "15px" }}>載入中…</p>
       </main>
     );
   }
 
   const teacherStatus = profile?.teacher_status ?? "none";
-  const role = teacherStatus === "approved" ? "teacher" : (profile?.role ?? "student");
+  const role =
+    teacherStatus === "approved"
+      ? "teacher"
+      : profile?.role === "admin"
+      ? "admin"
+      : "student";
+  const roleStyle = ROLE_STYLE[role] ?? ROLE_STYLE.student;
 
   return (
     <main
       style={{
         minHeight: "100vh",
-        background: "#f6f7fb",
-        padding: "48px 20px 80px",
-        fontFamily: "'Inter', 'Noto Sans TC', system-ui, sans-serif",
+        background: "#faf8f5",
+        padding: "52px 20px 96px",
+        fontFamily: "var(--font-body)",
       }}
     >
       <div style={{ maxWidth: "520px", margin: "0 auto" }}>
@@ -106,127 +115,89 @@ export default function AccountPage() {
           <Link
             href="/"
             style={{
-              color: "#9ca3af",
+              color: "#8896a4",
               fontSize: "13px",
+              fontWeight: 600,
               textDecoration: "none",
               display: "inline-flex",
               alignItems: "center",
               gap: "4px",
-              padding: "5px 10px",
-              borderRadius: "7px",
-              background: "#f3f4f6",
-              border: "1px solid #e5e7eb",
+              padding: "6px 13px",
+              borderRadius: "8px",
+              background: "#f0ede8",
+              border: "1px solid #e8e4df",
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.background = "#e8e4df";
+              el.style.color = "#1e2a4a";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.background = "#f0ede8";
+              el.style.color = "#8896a4";
             }}
           >
             ← 回首頁
           </Link>
         </div>
 
-        {/* Header */}
-        <div style={{ marginBottom: "24px" }}>
+        {/* Page title */}
+        <div style={{ marginBottom: "28px" }}>
           <h1
             style={{
-              fontSize: "24px",
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(22px, 4vw, 28px)",
               fontWeight: 700,
-              color: "#111827",
+              color: "#1e2a4a",
               margin: "0 0 6px",
+              letterSpacing: "-0.015em",
             }}
           >
             我的帳號
           </h1>
-          <p style={{ color: "#6b7280", fontSize: "14px", margin: 0 }}>
+          <p style={{ color: "#8896a4", fontSize: "14px", margin: 0 }}>
             {user?.email}
           </p>
         </div>
 
         {/* Profile card */}
-        <div
-          style={{
-            background: "#ffffff",
-            borderRadius: "16px",
-            padding: "24px",
-            boxShadow: "0 2px 10px rgba(15, 23, 42, 0.07)",
-            border: "1px solid #e5e7eb",
-            marginBottom: "16px",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "11px",
-              fontWeight: 700,
-              color: "#9ca3af",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              margin: "0 0 16px",
-            }}
-          >
-            帳號資訊
-          </p>
+        <div style={cardStyle}>
+          <p style={SECTION_LABEL}>帳號資訊</p>
 
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: "14px",
-            }}
-          >
-            <span style={{ fontSize: "14px", color: "#6b7280" }}>身份</span>
+          <div style={{ ...INFO_ROW, marginBottom: "16px" }}>
+            <span style={{ fontSize: "14px", color: "#8896a4" }}>身份</span>
             <span
               style={{
-                background: ROLE_BG[role] ?? "#f9fafb",
-                color: ROLE_COLOR[role] ?? "#374151",
-                fontSize: "13px",
-                fontWeight: 600,
-                padding: "3px 10px",
+                background: roleStyle.bg,
+                color: roleStyle.color,
+                border: `1px solid ${roleStyle.border}`,
+                fontSize: "12px",
+                fontWeight: 700,
+                padding: "3px 11px",
                 borderRadius: "999px",
+                letterSpacing: "0.03em",
               }}
             >
               {ROLE_LABEL[role] ?? role}
             </span>
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <span style={{ fontSize: "14px", color: "#6b7280" }}>顯示名稱</span>
-            <span style={{ fontSize: "14px", color: "#374151" }}>
+          <div style={INFO_ROW}>
+            <span style={{ fontSize: "14px", color: "#8896a4" }}>顯示名稱</span>
+            <span style={{ fontSize: "14px", color: "#4a5568", fontWeight: 500 }}>
               {profile?.display_name || "（尚未設定）"}
             </span>
           </div>
         </div>
 
         {/* Teacher status card */}
-        <div
-          style={{
-            background: "#ffffff",
-            borderRadius: "16px",
-            padding: "24px",
-            boxShadow: "0 2px 10px rgba(15, 23, 42, 0.07)",
-            border: "1px solid #e5e7eb",
-            marginBottom: "16px",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "11px",
-              fontWeight: 700,
-              color: "#9ca3af",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              margin: "0 0 16px",
-            }}
-          >
-            老師申請
-          </p>
+        <div style={cardStyle}>
+          <p style={SECTION_LABEL}>老師申請</p>
 
           {teacherStatus === "none" && (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-              <p style={{ margin: 0, fontSize: "14px", color: "#6b7280" }}>
+              <p style={{ margin: 0, fontSize: "14px", color: "#8896a4" }}>
                 尚未申請老師身份
               </p>
               <Link
@@ -236,15 +207,15 @@ export default function AccountPage() {
                 style={{
                   flexShrink: 0,
                   display: "inline-block",
-                  padding: "8px 16px",
+                  padding: "8px 18px",
                   borderRadius: "8px",
                   background: applyHovered ? "#6d28d9" : "#7c3aed",
-                  color: "#fff",
+                  color: "#ffffff",
                   fontSize: "13px",
                   fontWeight: 600,
                   textDecoration: "none",
                   transition: "background 0.15s",
-                  whiteSpace: "nowrap" as const,
+                  whiteSpace: "nowrap",
                 }}
               >
                 申請成為老師
@@ -253,45 +224,48 @@ export default function AccountPage() {
           )}
 
           {teacherStatus === "pending" && (
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "18px" }}>⏳</span>
-              <div>
-                <p style={{ margin: 0, fontSize: "14px", fontWeight: 600, color: "#374151" }}>
-                  審核中
-                </p>
-                <p style={{ margin: "2px 0 0", fontSize: "13px", color: "#9ca3af" }}>
-                  管理員會盡快審核你的申請。
-                </p>
-              </div>
+            <div>
+              <p style={{ margin: "0 0 4px", fontSize: "14px", fontWeight: 600, color: "#4a5568" }}>
+                審核中
+              </p>
+              <p style={{ margin: 0, fontSize: "13px", color: "#8896a4" }}>
+                管理員會盡快審核你的申請。
+              </p>
             </div>
           )}
 
           {teacherStatus === "approved" && (
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "18px" }}>🎓</span>
-              <div>
-                <p style={{ margin: 0, fontSize: "14px", fontWeight: 600, color: "#15803d" }}>
-                  已成為老師
-                </p>
-                <p style={{ margin: "2px 0 0", fontSize: "13px", color: "#9ca3af" }}>
-                  你的老師身份已通過審核。
-                </p>
+            <div>
+              <p style={{ margin: "0 0 4px", fontSize: "14px", fontWeight: 600, color: "#059669" }}>
+                已成為老師
+              </p>
+              <p style={{ margin: "0 0 12px", fontSize: "13px", color: "#8896a4" }}>
+                你的老師身份已通過審核。
+              </p>
+              <div
+                style={{
+                  padding: "11px 14px",
+                  borderRadius: "8px",
+                  background: "#ecfdf5",
+                  border: "1px solid #6ee7b7",
+                  fontSize: "13px",
+                  color: "#059669",
+                }}
+              >
+                ✓ 老師功能即將開放，敬請期待。
               </div>
             </div>
           )}
 
           {teacherStatus === "rejected" && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontSize: "18px" }}>❌</span>
-                <div>
-                  <p style={{ margin: 0, fontSize: "14px", fontWeight: 600, color: "#dc2626" }}>
-                    申請未通過
-                  </p>
-                  <p style={{ margin: "2px 0 0", fontSize: "13px", color: "#9ca3af" }}>
-                    你可以修改自我介紹後重新申請。
-                  </p>
-                </div>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+              <div>
+                <p style={{ margin: "0 0 4px", fontSize: "14px", fontWeight: 600, color: "#dc2626" }}>
+                  申請未通過
+                </p>
+                <p style={{ margin: 0, fontSize: "13px", color: "#8896a4" }}>
+                  可修改自我介紹後重新申請。
+                </p>
               </div>
               <Link
                 href="/become-teacher"
@@ -306,74 +280,40 @@ export default function AccountPage() {
                   fontWeight: 600,
                   textDecoration: "none",
                   border: "1px solid #fca5a5",
-                  whiteSpace: "nowrap" as const,
+                  whiteSpace: "nowrap",
                 }}
               >
                 重新申請
               </Link>
             </div>
           )}
-
-          {teacherStatus === "approved" && (
-            <div
-              style={{
-                marginTop: "14px",
-                padding: "12px",
-                borderRadius: "8px",
-                background: "#f0fdf4",
-                border: "1px solid #bbf7d0",
-                fontSize: "13px",
-                color: "#15803d",
-              }}
-            >
-              ✓ 老師功能即將開放，敬請期待。
-            </div>
-          )}
         </div>
 
         {/* Wallet card */}
-        <div
-          style={{
-            background: "#ffffff",
-            borderRadius: "16px",
-            padding: "24px",
-            boxShadow: "0 2px 10px rgba(15, 23, 42, 0.07)",
-            border: "1px solid #e5e7eb",
-            marginBottom: "24px",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "11px",
-              fontWeight: 700,
-              color: "#9ca3af",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              margin: "0 0 16px",
-            }}
-          >
-            代幣餘額
-          </p>
+        <div style={cardStyle}>
+          <p style={SECTION_LABEL}>代幣餘額</p>
 
-          <div style={{ display: "flex", gap: "16px" }}>
+          <div style={{ display: "flex", gap: "14px" }}>
             <div
               style={{
                 flex: 1,
-                background: "#eff6ff",
+                background: "#fdf8ee",
+                border: "1px solid #f5e6c8",
                 borderRadius: "12px",
-                padding: "16px",
+                padding: "18px",
                 textAlign: "center",
               }}
             >
-              <p style={{ margin: "0 0 4px", fontSize: "13px", color: "#6b7280" }}>
+              <p style={{ margin: "0 0 6px", fontSize: "12px", fontWeight: 600, color: "#a07030", letterSpacing: "0.06em", textTransform: "uppercase" }}>
                 免費代幣
               </p>
               <p
                 style={{
                   margin: 0,
-                  fontSize: "28px",
-                  fontWeight: 800,
-                  color: "#2563eb",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "32px",
+                  fontWeight: 700,
+                  color: "#1e2a4a",
                 }}
               >
                 {wallet?.free_tokens ?? 0}
@@ -383,19 +323,21 @@ export default function AccountPage() {
               style={{
                 flex: 1,
                 background: "#f5f3ff",
+                border: "1px solid #ede9fe",
                 borderRadius: "12px",
-                padding: "16px",
+                padding: "18px",
                 textAlign: "center",
               }}
             >
-              <p style={{ margin: "0 0 4px", fontSize: "13px", color: "#6b7280" }}>
+              <p style={{ margin: "0 0 6px", fontSize: "12px", fontWeight: 600, color: "#7c3aed", letterSpacing: "0.06em", textTransform: "uppercase" }}>
                 付費代幣
               </p>
               <p
                 style={{
                   margin: 0,
-                  fontSize: "28px",
-                  fontWeight: 800,
+                  fontFamily: "var(--font-display)",
+                  fontSize: "32px",
+                  fontWeight: 700,
                   color: "#7c3aed",
                 }}
               >
@@ -413,16 +355,15 @@ export default function AccountPage() {
           style={{
             display: "block",
             width: "100%",
-            padding: "13px",
+            padding: "14px",
             borderRadius: "10px",
-            border: "1.5px solid #e5e7eb",
+            border: `1px solid ${logoutHovered ? "#fca5a5" : "#e8e4df"}`,
             background: logoutHovered ? "#fef2f2" : "#ffffff",
-            color: logoutHovered ? "#dc2626" : "#6b7280",
+            color: logoutHovered ? "#dc2626" : "#8896a4",
             fontSize: "15px",
             fontWeight: 600,
             cursor: "pointer",
             transition: "background 0.15s, color 0.15s, border-color 0.15s",
-            borderColor: logoutHovered ? "#fca5a5" : "#e5e7eb",
           }}
         >
           登出
@@ -431,3 +372,12 @@ export default function AccountPage() {
     </main>
   );
 }
+
+const cardStyle: React.CSSProperties = {
+  background: "#ffffff",
+  borderRadius: "16px",
+  padding: "24px",
+  border: "1px solid #e8e4df",
+  boxShadow: "0 2px 8px rgba(30, 42, 74, 0.06)",
+  marginBottom: "14px",
+};

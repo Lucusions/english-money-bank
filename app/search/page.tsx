@@ -25,14 +25,21 @@ export default function SearchPage() {
       }
     }
 
-    const items: Array<{ type: "single"; question: any } | { type: "group"; groupId: string; questions: any[] }> = [];
+    const items: Array<
+      | { type: "single"; question: any }
+      | { type: "group"; groupId: string; questions: any[] }
+    > = [];
 
     for (const q of questions) {
       if (!q.group_id) {
         items.push({ type: "single", question: q });
       } else if (!seen.has(q.group_id)) {
         seen.add(q.group_id);
-        items.push({ type: "group", groupId: q.group_id, questions: groupMap.get(q.group_id)! });
+        items.push({
+          type: "group",
+          groupId: q.group_id,
+          questions: groupMap.get(q.group_id)!,
+        });
       }
     }
 
@@ -43,13 +50,11 @@ export default function SearchPage() {
     try {
       setLoading(true);
       setSearched(true);
-
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ keyword }),
       });
-
       const result = await res.json();
       setQuestions(result.data || []);
     } catch (error) {
@@ -64,65 +69,68 @@ export default function SearchPage() {
     <main
       style={{
         minHeight: "100vh",
-        background: "#f6f7fb",
-        padding: "48px 20px 80px",
-        fontFamily:
-          "'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif",
+        background: "#faf8f5",
+        padding: "52px 20px 96px",
+        fontFamily: "var(--font-body)",
       }}
     >
       <div style={{ maxWidth: "860px", margin: "0 auto" }}>
 
-        {/* ── Header ── */}
         <HomeButton />
         <AuthButton />
-        <div style={{ marginBottom: "32px" }}>
+
+        {/* Page header */}
+        <div style={{ marginBottom: "36px" }}>
           <span
             style={{
               display: "inline-block",
-              background: "#eff6ff",
-              color: "#2563eb",
-              fontSize: "12px",
-              fontWeight: 600,
-              letterSpacing: "0.06em",
-              padding: "4px 10px",
+              background: "#fdf8ee",
+              color: "#c9a84c",
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.1em",
+              padding: "4px 12px",
               borderRadius: "999px",
-              marginBottom: "12px",
+              marginBottom: "14px",
               textTransform: "uppercase",
+              border: "1px solid #f5e6c8",
             }}
           >
-            題庫平台 Beta
+            題庫搜尋
           </span>
           <h1
             style={{
-              fontSize: "28px",
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(24px, 4vw, 34px)",
               fontWeight: 700,
-              color: "#111827",
-              margin: "0 0 8px",
-              lineHeight: 1.3,
+              color: "#1e2a4a",
+              margin: "0 0 10px",
+              lineHeight: 1.2,
+              letterSpacing: "-0.015em",
             }}
           >
             英文題庫搜尋
           </h1>
           <p
             style={{
-              color: "#6b7280",
+              color: "#8896a4",
               fontSize: "15px",
               margin: 0,
-              lineHeight: 1.6,
+              lineHeight: 1.65,
             }}
           >
-            輸入關鍵字搜尋單選題，即時預覽題目與答案。
+            輸入關鍵字搜尋題目，即時預覽題目與選項。
           </p>
         </div>
 
-        {/* ── Search bar ── */}
+        {/* Search bar */}
         <div
           style={{
             background: "#ffffff",
-            border: "1px solid #e5e7eb",
-            borderRadius: "16px",
+            border: "1px solid #e8e4df",
+            borderRadius: "18px",
             padding: "16px",
-            boxShadow: "0 2px 8px rgba(15, 23, 42, 0.06)",
+            boxShadow: "0 4px 16px rgba(30, 42, 74, 0.07)",
             marginBottom: "28px",
           }}
         >
@@ -133,46 +141,46 @@ export default function SearchPage() {
               onFocus={() => setInputFocused(true)}
               onBlur={() => setInputFocused(false)}
               onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
-              placeholder="輸入關鍵字，例如 she、meeting、homework"
+              placeholder="輸入關鍵字，例如：she、meeting、homework…"
               style={{
                 flex: 1,
-                minWidth: "240px",
-                padding: "12px 16px",
+                minWidth: "220px",
+                padding: "13px 16px",
                 border: inputFocused
-                  ? "1.5px solid #2563eb"
-                  : "1.5px solid #d1d5db",
+                  ? "1.5px solid #1e2a4a"
+                  : "1.5px solid #e8e4df",
                 borderRadius: "10px",
                 fontSize: "15px",
-                color: "#111827",
-                background: "#fafafa",
+                color: "#1a1f2e",
+                background: "#faf8f5",
                 outline: "none",
                 boxShadow: inputFocused
-                  ? "0 0 0 3px rgba(37, 99, 235, 0.12)"
+                  ? "0 0 0 3px rgba(30, 42, 74, 0.10)"
                   : "none",
                 transition: "border-color 0.15s, box-shadow 0.15s",
+                fontFamily: "var(--font-body)",
               }}
             />
-
             <button
               onClick={handleSearch}
               disabled={loading}
               onMouseEnter={() => setBtnHovered(true)}
               onMouseLeave={() => setBtnHovered(false)}
               style={{
-                padding: "12px 24px",
+                padding: "13px 28px",
                 borderRadius: "10px",
                 border: "none",
                 background: loading
-                  ? "#93c5fd"
+                  ? "#8896b8"
                   : btnHovered
-                  ? "#1d4ed8"
-                  : "#2563eb",
+                  ? "#2d3f6e"
+                  : "#1e2a4a",
                 color: "#ffffff",
                 fontSize: "15px",
                 fontWeight: 600,
                 cursor: loading ? "not-allowed" : "pointer",
-                minWidth: "100px",
-                letterSpacing: "0.01em",
+                minWidth: "96px",
+                letterSpacing: "0.02em",
                 transition: "background 0.15s",
                 flexShrink: 0,
               }}
@@ -182,10 +190,10 @@ export default function SearchPage() {
           </div>
         </div>
 
-        {/* ── Result count ── */}
-        <div style={{ minHeight: "28px", marginBottom: "16px" }}>
+        {/* Result count / status */}
+        <div style={{ minHeight: "32px", marginBottom: "20px" }}>
           {loading && (
-            <span style={{ color: "#6b7280", fontSize: "14px" }}>
+            <span style={{ color: "#8896a4", fontSize: "14px" }}>
               正在搜尋題目…
             </span>
           )}
@@ -195,55 +203,48 @@ export default function SearchPage() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
-                background: "#f0fdf4",
-                color: "#15803d",
+                background: "#ecfdf5",
+                color: "#059669",
                 fontSize: "13px",
-                fontWeight: 500,
-                padding: "4px 12px",
+                fontWeight: 600,
+                padding: "5px 14px",
                 borderRadius: "999px",
-                border: "1px solid #bbf7d0",
+                border: "1px solid #6ee7b7",
               }}
             >
-              找到
-              <strong style={{ fontWeight: 700 }}>{questions.length}</strong>
+              找到{" "}
+              <strong style={{ fontWeight: 800, fontSize: "14px" }}>
+                {questions.length}
+              </strong>{" "}
               題
             </span>
           )}
         </div>
 
-        {/* ── Question list ── */}
-        <div style={{ display: "grid", gap: "14px" }}>
+        {/* Question list */}
+        <div style={{ display: "grid", gap: "16px" }}>
           {!loading && searched && questions.length === 0 && (
             <div
               style={{
                 background: "#ffffff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "14px",
-                padding: "40px 28px",
+                border: "1px solid #e8e4df",
+                borderRadius: "16px",
+                padding: "52px 28px",
                 textAlign: "center",
-                boxShadow: "0 1px 4px rgba(15, 23, 42, 0.05)",
+                boxShadow: "0 2px 8px rgba(30, 42, 74, 0.05)",
               }}
             >
-              <div
-                style={{
-                  fontSize: "32px",
-                  marginBottom: "12px",
-                  lineHeight: 1,
-                }}
-              >
-                🔍
-              </div>
               <p
                 style={{
-                  color: "#374151",
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  margin: "0 0 6px",
+                  color: "#1a1f2e",
+                  fontSize: "16px",
+                  fontWeight: 600,
+                  margin: "0 0 8px",
                 }}
               >
                 找不到符合的題目
               </p>
-              <p style={{ color: "#9ca3af", fontSize: "13px", margin: 0 }}>
+              <p style={{ color: "#b4bec8", fontSize: "14px", margin: 0, lineHeight: 1.6 }}>
                 試試不同的關鍵字，或縮短搜尋詞。
               </p>
             </div>

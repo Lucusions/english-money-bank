@@ -9,12 +9,21 @@ type ExamType = "cee" | "csat" | "toeic";
 type CountOption = 5 | 10 | 20;
 
 const EXAM_TYPES: { key: ExamType; label: string }[] = [
-  { key: "cee", label: "會考" },
+  { key: "cee",  label: "會考" },
   { key: "csat", label: "學測" },
   { key: "toeic", label: "TOEIC" },
 ];
 
 const COUNTS: CountOption[] = [5, 10, 20];
+
+const CARD_STYLE = {
+  background: "#ffffff",
+  borderRadius: "16px",
+  padding: "22px 24px",
+  border: "1px solid #e8e4df",
+  boxShadow: "0 2px 8px rgba(30, 42, 74, 0.06)",
+  marginBottom: "14px",
+};
 
 export default function PracticeBuilderPage() {
   const router = useRouter();
@@ -47,121 +56,70 @@ export default function PracticeBuilderPage() {
     }
   }
 
-  function SectionTitle({ label }: { label: string }) {
-    return (
-      <p
-        style={{
-          fontSize: "11px",
-          fontWeight: 700,
-          color: "#9ca3af",
-          letterSpacing: "0.08em",
-          textTransform: "uppercase" as const,
-          margin: "0 0 12px",
-        }}
-      >
-        {label}
-      </p>
-    );
-  }
-
-  function ComingSoonCard({ label }: { label: string }) {
-    return (
-      <div
-        style={{
-          position: "relative" as const,
-          padding: "12px 16px",
-          borderRadius: "10px",
-          border: "1.5px solid #e5e7eb",
-          background: "#f9fafb",
-          opacity: 0.55,
-          cursor: "not-allowed",
-          fontSize: "14px",
-          color: "#9ca3af",
-          userSelect: "none" as const,
-        }}
-      >
-        {label}
-        <span
-          style={{
-            position: "absolute" as const,
-            top: "-8px",
-            right: "-6px",
-            background: "#f59e0b",
-            color: "#fff",
-            fontSize: "9px",
-            fontWeight: 700,
-            padding: "2px 7px",
-            borderRadius: "999px",
-            letterSpacing: "0.04em",
-          }}
-        >
-          SOON
-        </span>
-      </div>
-    );
-  }
-
   return (
     <main
       style={{
         minHeight: "100vh",
-        background: "#f6f7fb",
-        padding: "48px 20px 80px",
-        fontFamily: "'Inter', 'Noto Sans TC', system-ui, sans-serif",
+        background: "#faf8f5",
+        padding: "52px 20px 96px",
+        fontFamily: "var(--font-body)",
       }}
     >
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
 
         <HomeButton />
         <AuthButton />
+
         {/* Header */}
-        <div style={{ marginBottom: "32px" }}>
+        <div style={{ marginBottom: "36px" }}>
           <span
             style={{
               display: "inline-block",
-              background: "#eff6ff",
-              color: "#2563eb",
-              fontSize: "12px",
-              fontWeight: 600,
-              padding: "4px 10px",
+              background: "#fdf8ee",
+              color: "#c9a84c",
+              fontSize: "11px",
+              fontWeight: 700,
+              padding: "4px 12px",
               borderRadius: "999px",
-              marginBottom: "12px",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase" as const,
+              marginBottom: "14px",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              border: "1px solid #f5e6c8",
             }}
           >
-            練習設定
+            練習模式
           </span>
           <h1
             style={{
-              fontSize: "26px",
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(22px, 4vw, 30px)",
               fontWeight: 700,
-              color: "#111827",
-              margin: "0 0 8px",
-              lineHeight: 1.3,
+              color: "#1e2a4a",
+              margin: "0 0 10px",
+              lineHeight: 1.2,
+              letterSpacing: "-0.015em",
             }}
           >
             設定練習內容
           </h1>
-          <p style={{ color: "#6b7280", fontSize: "15px", margin: 0, lineHeight: 1.6 }}>
+          <p
+            style={{
+              color: "#8896a4",
+              fontSize: "15px",
+              margin: 0,
+              lineHeight: 1.65,
+            }}
+          >
             選擇考試類型與題目數量，即時生成隨機練習題。
           </p>
         </div>
 
         {/* Exam type */}
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: "14px",
-            padding: "20px",
-            boxShadow: "0 1px 4px rgba(15,23,42,0.06)",
-            marginBottom: "14px",
-          }}
-        >
-          <SectionTitle label="考試類型" />
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" as const }}>
+        <div style={CARD_STYLE}>
+          <SectionLabel label="考試類型" />
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             {EXAM_TYPES.map((item) => {
-              const selected = examType === item.key;
+              const sel = examType === item.key;
               return (
                 <button
                   key={item.key}
@@ -169,13 +127,13 @@ export default function PracticeBuilderPage() {
                   style={{
                     padding: "8px 20px",
                     borderRadius: "999px",
-                    border: selected ? "none" : "1.5px solid #e5e7eb",
-                    background: selected ? "#2563eb" : "#fff",
-                    color: selected ? "#fff" : "#6b7280",
+                    border: sel ? "none" : "1px solid #e8e4df",
+                    background: sel ? "#1e2a4a" : "#ffffff",
+                    color: sel ? "#ffffff" : "#4a5568",
                     fontSize: "14px",
-                    fontWeight: selected ? 600 : 400,
+                    fontWeight: sel ? 600 : 400,
                     cursor: "pointer",
-                    transition: "background 0.12s",
+                    transition: "background 0.12s, color 0.12s",
                   }}
                 >
                   {item.label}
@@ -183,35 +141,26 @@ export default function PracticeBuilderPage() {
               );
             })}
           </div>
-          <p style={{ margin: "10px 0 0", fontSize: "12px", color: "#d1d5db" }}>
+          <p style={{ margin: "12px 0 0", fontSize: "12px", color: "#b4bec8", lineHeight: 1.5 }}>
             考試類型篩選即將推出，目前從全部題庫隨機取題。
           </p>
         </div>
 
         {/* Question type */}
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: "14px",
-            padding: "20px",
-            boxShadow: "0 1px 4px rgba(15,23,42,0.06)",
-            marginBottom: "14px",
-          }}
-        >
-          <SectionTitle label="題型" />
+        <div style={CARD_STYLE}>
+          <SectionLabel label="題型" />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
-            {/* Single choice — enabled & always selected */}
             <div
               style={{
                 padding: "12px 16px",
                 borderRadius: "10px",
-                border: "2px solid #2563eb",
-                background: "#eff6ff",
+                border: "2px solid #1e2a4a",
+                background: "#f0ede8",
                 cursor: "default",
                 fontSize: "14px",
                 fontWeight: 600,
-                color: "#1d4ed8",
-                userSelect: "none" as const,
+                color: "#1e2a4a",
+                userSelect: "none",
               }}
             >
               單選題
@@ -222,29 +171,20 @@ export default function PracticeBuilderPage() {
         </div>
 
         {/* Source */}
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: "14px",
-            padding: "20px",
-            boxShadow: "0 1px 4px rgba(15,23,42,0.06)",
-            marginBottom: "14px",
-          }}
-        >
-          <SectionTitle label="題目來源" />
+        <div style={CARD_STYLE}>
+          <SectionLabel label="題目來源" />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-            {/* All — enabled & always selected */}
             <div
               style={{
                 padding: "12px 16px",
                 borderRadius: "10px",
-                border: "2px solid #2563eb",
-                background: "#eff6ff",
+                border: "2px solid #1e2a4a",
+                background: "#f0ede8",
                 cursor: "default",
                 fontSize: "14px",
                 fontWeight: 600,
-                color: "#1d4ed8",
-                userSelect: "none" as const,
+                color: "#1e2a4a",
+                userSelect: "none",
               }}
             >
               全部題庫
@@ -254,32 +194,25 @@ export default function PracticeBuilderPage() {
         </div>
 
         {/* Count */}
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: "14px",
-            padding: "20px",
-            boxShadow: "0 1px 4px rgba(15,23,42,0.06)",
-            marginBottom: "28px",
-          }}
-        >
-          <SectionTitle label="題目數量" />
+        <div style={{ ...CARD_STYLE, marginBottom: "28px" }}>
+          <SectionLabel label="題目數量" />
           <div style={{ display: "flex", gap: "10px" }}>
             {COUNTS.map((n) => {
-              const selected = count === n;
+              const sel = count === n;
               return (
                 <button
                   key={n}
                   onClick={() => setCount(n)}
                   style={{
                     flex: 1,
-                    padding: "14px",
+                    padding: "16px",
                     borderRadius: "10px",
-                    border: selected ? "2px solid #2563eb" : "1.5px solid #e5e7eb",
-                    background: selected ? "#eff6ff" : "#fff",
-                    color: selected ? "#1d4ed8" : "#374151",
-                    fontSize: "18px",
-                    fontWeight: selected ? 700 : 400,
+                    border: sel ? "2px solid #1e2a4a" : "1px solid #e8e4df",
+                    background: sel ? "#f0ede8" : "#ffffff",
+                    color: sel ? "#1e2a4a" : "#4a5568",
+                    fontSize: "20px",
+                    fontFamily: "var(--font-display)",
+                    fontWeight: sel ? 700 : 400,
                     cursor: "pointer",
                     transition: "border-color 0.12s, background 0.12s",
                   }}
@@ -308,7 +241,7 @@ export default function PracticeBuilderPage() {
           </div>
         )}
 
-        {/* Start button */}
+        {/* Start */}
         <button
           onClick={handleStart}
           disabled={loading}
@@ -317,11 +250,15 @@ export default function PracticeBuilderPage() {
           style={{
             display: "block",
             width: "100%",
-            padding: "16px",
+            padding: "17px",
             borderRadius: "12px",
             border: "none",
-            background: loading ? "#93c5fd" : startHovered ? "#1d4ed8" : "#2563eb",
-            color: "#fff",
+            background: loading
+              ? "#8896b8"
+              : startHovered
+              ? "#2d3f6e"
+              : "#1e2a4a",
+            color: "#ffffff",
             fontSize: "16px",
             fontWeight: 700,
             cursor: loading ? "not-allowed" : "pointer",
@@ -333,5 +270,59 @@ export default function PracticeBuilderPage() {
         </button>
       </div>
     </main>
+  );
+}
+
+function SectionLabel({ label }: { label: string }) {
+  return (
+    <p
+      style={{
+        fontSize: "11px",
+        fontWeight: 700,
+        color: "#8896a4",
+        letterSpacing: "0.1em",
+        textTransform: "uppercase",
+        margin: "0 0 14px",
+      }}
+    >
+      {label}
+    </p>
+  );
+}
+
+function ComingSoonCard({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        position: "relative",
+        padding: "12px 16px",
+        borderRadius: "10px",
+        border: "1px solid #e8e4df",
+        background: "#faf8f5",
+        opacity: 0.6,
+        cursor: "not-allowed",
+        fontSize: "14px",
+        color: "#8896a4",
+        userSelect: "none",
+      }}
+    >
+      {label}
+      <span
+        style={{
+          position: "absolute",
+          top: "-8px",
+          right: "-6px",
+          background: "#1e2a4a",
+          color: "#c9a84c",
+          fontSize: "9px",
+          fontWeight: 700,
+          padding: "2px 7px",
+          borderRadius: "999px",
+          letterSpacing: "0.06em",
+        }}
+      >
+        SOON
+      </span>
+    </div>
   );
 }

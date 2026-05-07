@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import HomeButton from "../../components/HomeButton";
+import AuthButton from "../../components/AuthButton";
 import { getSupabaseBrowser } from "../../lib/supabase-browser";
 
 interface FailedItem {
@@ -83,33 +84,71 @@ export default function BulkImportPage() {
     <main
       style={{
         minHeight: "100vh",
-        background: "#f6f7fb",
-        padding: "32px 20px",
-        fontFamily: "'Inter', 'Noto Sans TC', system-ui, sans-serif",
+        background: "#faf8f5",
+        padding: "52px 20px 96px",
+        fontFamily: "var(--font-body)",
       }}
     >
       <div style={{ maxWidth: "720px", margin: "0 auto" }}>
-        <div style={{ marginBottom: "24px" }}>
-          <Link href="/" style={{ color: "#9ca3af", fontSize: "13px", textDecoration: "none" }}>
-            ← 回首頁
-          </Link>
+
+        <HomeButton />
+        <AuthButton />
+
+        {/* Header */}
+        <div style={{ marginBottom: "32px" }}>
+          <span
+            style={{
+              display: "inline-block",
+              background: "#1e2a4a",
+              color: "#c9a84c",
+              fontSize: "11px",
+              fontWeight: 700,
+              padding: "4px 12px",
+              borderRadius: "999px",
+              marginBottom: "14px",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+            }}
+          >
+            Admin
+          </span>
+          <h1
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(22px, 4vw, 30px)",
+              fontWeight: 700,
+              color: "#1e2a4a",
+              margin: "0 0 10px",
+              letterSpacing: "-0.015em",
+            }}
+          >
+            批次匯入題目
+          </h1>
+          <p style={{ color: "#8896a4", fontSize: "14px", margin: 0, lineHeight: 1.65 }}>
+            貼上 JSON 陣列，每個物件包含 question、options、tags
+          </p>
         </div>
 
-        <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#111827", margin: "0 0 6px" }}>
-          批次匯入題目
-        </h1>
-        <p style={{ color: "#6b7280", fontSize: "14px", margin: "0 0 28px" }}>
-          貼上 JSON 陣列，每個物件包含 question、options、tags
-        </p>
-
-        <div style={{ marginBottom: "16px" }}>
+        {/* JSON Textarea */}
+        <div
+          style={{
+            background: "#ffffff",
+            border: "1px solid #e8e4df",
+            borderRadius: "16px",
+            padding: "20px",
+            boxShadow: "0 4px 16px rgba(30, 42, 74, 0.06)",
+            marginBottom: "16px",
+          }}
+        >
           <label
             style={{
               display: "block",
-              fontSize: "13px",
-              fontWeight: 600,
-              color: "#374151",
-              marginBottom: "8px",
+              fontSize: "11px",
+              fontWeight: 700,
+              color: "#8896a4",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              marginBottom: "12px",
             }}
           >
             JSON 內容
@@ -127,83 +166,108 @@ export default function BulkImportPage() {
             rows={18}
             style={{
               width: "100%",
-              padding: "14px",
-              borderRadius: "12px",
-              border: focused ? "1.5px solid #2563eb" : "1.5px solid #d1d5db",
-              background: "#ffffff",
+              padding: "14px 16px",
+              borderRadius: "10px",
+              border: focused ? "1.5px solid #1e2a4a" : "1.5px solid #e8e4df",
+              background: "#faf8f5",
               fontSize: "13px",
               fontFamily: "'Fira Code', 'Courier New', monospace",
-              color: "#111827",
+              color: "#1a1f2e",
               outline: "none",
               resize: "vertical",
               boxSizing: "border-box",
-              lineHeight: 1.6,
-              boxShadow: focused ? "0 0 0 3px rgba(37,99,235,0.08)" : "none",
+              lineHeight: 1.65,
+              boxShadow: focused ? "0 0 0 3px rgba(30, 42, 74, 0.10)" : "none",
               transition: "border-color 0.15s, box-shadow 0.15s",
             }}
           />
         </div>
 
+        {/* Import button */}
         <div style={{ marginBottom: "20px" }}>
           <button
             onClick={handleImport}
             disabled={!raw.trim() || isImporting}
             style={{
-              padding: "10px 24px",
+              padding: "12px 28px",
               borderRadius: "10px",
               border: "none",
-              background: !raw.trim() || isImporting ? "#93c5fd" : "#2563eb",
+              background: !raw.trim() || isImporting ? "#8896b8" : "#1e2a4a",
               color: "#ffffff",
               fontSize: "14px",
               fontWeight: 700,
               cursor: !raw.trim() || isImporting ? "not-allowed" : "pointer",
               transition: "background 0.15s",
+              letterSpacing: "0.01em",
+            }}
+            onMouseEnter={(e) => {
+              if (raw.trim() && !isImporting) {
+                (e.currentTarget as HTMLButtonElement).style.background = "#2d3f6e";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (raw.trim() && !isImporting) {
+                (e.currentTarget as HTMLButtonElement).style.background = "#1e2a4a";
+              }
             }}
           >
-            {isImporting ? "匯入中…" : "匯入"}
+            {isImporting ? "匯入中…" : "執行匯入"}
           </button>
         </div>
 
+        {/* Error */}
         {(parseError || apiError) && (
           <div
             style={{
               background: "#fef2f2",
               border: "1px solid #fca5a5",
               borderRadius: "10px",
-              padding: "12px 16px",
+              padding: "13px 16px",
               color: "#dc2626",
               fontSize: "14px",
               marginBottom: "16px",
+              lineHeight: 1.5,
             }}
           >
             ✗ {parseError || apiError}
           </div>
         )}
 
+        {/* Success result */}
         {status === "done" && (
           <div
             style={{
               background: "#ffffff",
-              border: "1px solid #e5e7eb",
-              borderRadius: "12px",
-              padding: "20px",
-              marginBottom: "16px",
+              border: "1px solid #e8e4df",
+              borderRadius: "14px",
+              padding: "22px 24px",
+              marginBottom: "20px",
+              boxShadow: "0 2px 8px rgba(30, 42, 74, 0.06)",
             }}
           >
             <p
               style={{
                 fontSize: "16px",
                 fontWeight: 700,
-                color: insertedCount > 0 ? "#15803d" : "#6b7280",
-                margin: "0 0 8px",
+                color: insertedCount > 0 ? "#059669" : "#8896a4",
+                margin: "0 0 10px",
               }}
             >
-              {insertedCount > 0 ? `✓ 成功匯入 ${insertedCount} 題` : "匯入完成（0 題成功）"}
+              {insertedCount > 0
+                ? `✓ 成功匯入 ${insertedCount} 題`
+                : "匯入完成（0 題成功）"}
             </p>
 
             {failed.length > 0 && (
-              <div style={{ marginTop: "12px" }}>
-                <p style={{ fontSize: "13px", fontWeight: 600, color: "#dc2626", margin: "0 0 8px" }}>
+              <div>
+                <p
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: "#dc2626",
+                    margin: "0 0 10px",
+                  }}
+                >
                   失敗 {failed.length} 題：
                 </p>
                 <div style={{ display: "grid", gap: "6px" }}>
@@ -212,11 +276,12 @@ export default function BulkImportPage() {
                       key={f.index}
                       style={{
                         background: "#fef2f2",
-                        border: "1px solid #fecaca",
+                        border: "1px solid #fca5a5",
                         borderRadius: "8px",
-                        padding: "8px 12px",
+                        padding: "9px 13px",
                         fontSize: "13px",
                         color: "#991b1b",
+                        lineHeight: 1.5,
                       }}
                     >
                       {f.error}
@@ -228,30 +293,33 @@ export default function BulkImportPage() {
           </div>
         )}
 
+        {/* Format docs */}
         <details style={{ marginTop: "24px" }}>
           <summary
             style={{
               fontSize: "13px",
               fontWeight: 600,
-              color: "#9ca3af",
+              color: "#8896a4",
               cursor: "pointer",
               userSelect: "none",
+              padding: "4px 0",
             }}
           >
             查看 JSON 格式說明
           </summary>
           <pre
             style={{
-              marginTop: "12px",
-              padding: "16px",
-              background: "#f8fafc",
-              border: "1px solid #e2e8f0",
-              borderRadius: "10px",
+              marginTop: "14px",
+              padding: "18px 20px",
+              background: "#ffffff",
+              border: "1px solid #e8e4df",
+              borderRadius: "12px",
               fontSize: "12px",
-              color: "#374151",
-              lineHeight: 1.7,
+              color: "#4a5568",
+              lineHeight: 1.75,
               overflowX: "auto",
               whiteSpace: "pre",
+              fontFamily: "'Fira Code', 'Courier New', monospace",
             }}
           >{`[
   {

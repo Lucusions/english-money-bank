@@ -10,9 +10,8 @@ interface NavbarProps {
 }
 
 const NAV_LINKS = [
-  { href: "/search",   label: "題庫搜尋" },
+  { href: "/search",           label: "題庫搜尋" },
   { href: "/practice-builder", label: "練習模式" },
-  { href: "/reading",  label: "閱讀題組" },
 ];
 
 export default function Navbar({ darkHero = false }: NavbarProps) {

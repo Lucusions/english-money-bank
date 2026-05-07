@@ -22,22 +22,14 @@ interface Question {
   options: Option[];
 }
 
-const DIFFICULTY_LABEL: Record<string, string> = {
-  easy: "簡單",
-  medium: "中等",
-  hard: "困難",
+const DIFF_LABEL: Record<string, string> = {
+  easy: "簡單", medium: "中等", hard: "困難",
 };
-
-const DIFFICULTY_COLOR: Record<string, string> = {
-  easy: "#15803d",
-  medium: "#b45309",
-  hard: "#dc2626",
+const DIFF_COLOR: Record<string, string> = {
+  easy: "#059669", medium: "#b45309", hard: "#dc2626",
 };
-
-const DIFFICULTY_BG: Record<string, string> = {
-  easy: "#f0fdf4",
-  medium: "#fffbeb",
-  hard: "#fef2f2",
+const DIFF_BG: Record<string, string> = {
+  easy: "#ecfdf5", medium: "#fffbeb", hard: "#fef2f2",
 };
 
 export default function PracticePage() {
@@ -63,39 +55,63 @@ export default function PracticePage() {
       <main
         style={{
           minHeight: "100vh",
-          position: "relative",
-          background: "#f6f7fb",
+          background: "#faf8f5",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "'Inter', 'Noto Sans TC', system-ui, sans-serif",
+          fontFamily: "var(--font-body)",
           padding: "20px",
         }}
       >
         <AuthButton />
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "48px", marginBottom: "16px" }}>📋</div>
-          <p
+        <div
+          style={{
+            background: "#ffffff",
+            border: "1px solid #e8e4df",
+            borderRadius: "20px",
+            padding: "52px 40px",
+            textAlign: "center",
+            boxShadow: "0 4px 16px rgba(30, 42, 74, 0.07)",
+            maxWidth: "400px",
+          }}
+        >
+          <div
             style={{
-              color: "#374151",
-              fontSize: "16px",
-              fontWeight: 500,
-              margin: "0 0 6px",
+              width: "56px",
+              height: "56px",
+              borderRadius: "14px",
+              background: "#f0ede8",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 20px",
+              fontSize: "22px",
+              color: "#8896a4",
             }}
           >
-            沒有練習題目
+            ?
+          </div>
+          <p
+            style={{
+              color: "#1a1f2e",
+              fontSize: "17px",
+              fontWeight: 600,
+              margin: "0 0 8px",
+            }}
+          >
+            尚無練習題目
           </p>
-          <p style={{ color: "#9ca3af", fontSize: "14px", margin: "0 0 24px" }}>
+          <p style={{ color: "#8896a4", fontSize: "14px", margin: "0 0 28px", lineHeight: 1.65 }}>
             請先設定練習內容再開始。
           </p>
           <button
             onClick={() => router.push("/practice-builder")}
             style={{
-              padding: "12px 28px",
+              padding: "13px 32px",
               borderRadius: "10px",
               border: "none",
-              background: "#2563eb",
-              color: "#fff",
+              background: "#1e2a4a",
+              color: "#ffffff",
               fontSize: "15px",
               fontWeight: 600,
               cursor: "pointer",
@@ -136,20 +152,20 @@ export default function PracticePage() {
       width: "100%",
       textAlign: "left",
       padding: "14px 18px",
-      borderRadius: "10px",
+      borderRadius: "12px",
       fontSize: "15px",
       lineHeight: 1.6,
       boxSizing: "border-box",
-      transition: "border-color 0.1s, background 0.1s",
+      transition: "border-color 0.12s, background 0.12s",
     };
 
     if (!isAnswered) {
       const hovered = hoveredOpt === opt.id;
       return {
         ...base,
-        border: hovered ? "1.5px solid #93c5fd" : "1.5px solid #e5e7eb",
-        background: hovered ? "#eff6ff" : "#fff",
-        color: "#111827",
+        border: hovered ? "1.5px solid #4a5872" : "1px solid #e8e4df",
+        background: hovered ? "#f7f8fa" : "#ffffff",
+        color: "#1a1f2e",
         cursor: "pointer",
       };
     }
@@ -157,9 +173,9 @@ export default function PracticePage() {
     if (opt.id === selectedId && opt.is_correct) {
       return {
         ...base,
-        border: "2px solid #86efac",
-        background: "#f0fdf4",
-        color: "#15803d",
+        border: "2px solid #6ee7b7",
+        background: "#ecfdf5",
+        color: "#065f46",
         fontWeight: 600,
         cursor: "default",
       };
@@ -179,19 +195,19 @@ export default function PracticePage() {
     if (opt.is_correct) {
       return {
         ...base,
-        border: "2px solid #86efac",
-        background: "#f0fdf4",
-        color: "#15803d",
+        border: "2px solid #6ee7b7",
+        background: "#ecfdf5",
+        color: "#065f46",
         cursor: "default",
       };
     }
 
     return {
       ...base,
-      border: "1.5px solid #e5e7eb",
-      background: "#fafafa",
-      color: "#9ca3af",
-      opacity: 0.5,
+      border: "1px solid #e8e4df",
+      background: "#faf8f5",
+      color: "#b4bec8",
+      opacity: 0.55,
       cursor: "default",
     };
   }
@@ -211,15 +227,20 @@ export default function PracticePage() {
       return selId && q.options.find((o) => o.id === selId)?.is_correct;
     }).length;
     const pct = Math.round((correctCount / total) * 100);
-    const emoji = pct >= 80 ? "🎉" : pct >= 60 ? "👍" : "📚";
+    const scoreColor =
+      pct >= 80 ? "#059669" : pct >= 60 ? "#c9a84c" : "#dc2626";
+    const scoreBg =
+      pct >= 80 ? "#ecfdf5" : pct >= 60 ? "#fdf8ee" : "#fef2f2";
+    const scoreBorder =
+      pct >= 80 ? "#6ee7b7" : pct >= 60 ? "#f5e6c8" : "#fca5a5";
 
     return (
       <main
         style={{
           minHeight: "100vh",
-          background: "#f6f7fb",
-          padding: "48px 20px 80px",
-          fontFamily: "'Inter', 'Noto Sans TC', system-ui, sans-serif",
+          background: "#faf8f5",
+          padding: "52px 20px 96px",
+          fontFamily: "var(--font-body)",
         }}
       >
         <AuthButton />
@@ -228,33 +249,60 @@ export default function PracticePage() {
           {/* Score card */}
           <div
             style={{
-              background: "#fff",
-              borderRadius: "16px",
-              padding: "40px 32px",
-              boxShadow: "0 2px 12px rgba(15,23,42,0.07)",
+              background: "#ffffff",
+              borderRadius: "20px",
+              padding: "48px 36px",
+              border: "1px solid #e8e4df",
+              boxShadow: "0 6px 24px rgba(30, 42, 74, 0.09)",
               textAlign: "center",
               marginBottom: "20px",
             }}
           >
-            <div style={{ fontSize: "52px", marginBottom: "16px" }}>{emoji}</div>
-            <h1
+            {/* Big score circle */}
+            <div
               style={{
-                fontSize: "24px",
-                fontWeight: 700,
-                color: "#111827",
-                margin: "0 0 10px",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100px",
+                height: "100px",
+                borderRadius: "50%",
+                background: scoreBg,
+                border: `3px solid ${scoreBorder}`,
+                marginBottom: "24px",
               }}
             >
-              練習完成！
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "28px",
+                  fontWeight: 700,
+                  color: scoreColor,
+                }}
+              >
+                {pct}%
+              </span>
+            </div>
+
+            <h1
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "26px",
+                fontWeight: 700,
+                color: "#1e2a4a",
+                margin: "0 0 12px",
+              }}
+            >
+              練習完成
             </h1>
-            <p style={{ color: "#6b7280", fontSize: "15px", margin: "0 0 6px" }}>
+            <p style={{ color: "#4a5568", fontSize: "16px", margin: "0 0 4px" }}>
               答對{" "}
-              <strong style={{ color: "#111827", fontSize: "20px" }}>
+              <strong style={{ color: "#1e2a4a", fontSize: "20px", fontFamily: "var(--font-display)" }}>
                 {correctCount}
               </strong>{" "}
               / {total} 題
             </p>
-            <p style={{ color: "#9ca3af", fontSize: "13px", margin: "0 0 28px" }}>
+            <p style={{ color: "#b4bec8", fontSize: "13px", margin: "0 0 32px" }}>
               正確率 {pct}%
             </p>
             <button
@@ -262,11 +310,11 @@ export default function PracticePage() {
               onMouseEnter={() => setRestartHovered(true)}
               onMouseLeave={() => setRestartHovered(false)}
               style={{
-                padding: "12px 32px",
+                padding: "13px 36px",
                 borderRadius: "10px",
                 border: "none",
-                background: restartHovered ? "#1d4ed8" : "#2563eb",
-                color: "#fff",
+                background: restartHovered ? "#2d3f6e" : "#1e2a4a",
+                color: "#ffffff",
                 fontSize: "15px",
                 fontWeight: 600,
                 cursor: "pointer",
@@ -278,7 +326,7 @@ export default function PracticePage() {
           </div>
 
           {/* Per-question summary */}
-          <div style={{ display: "grid", gap: "10px" }}>
+          <div style={{ display: "grid", gap: "8px" }}>
             {questions.map((q, i) => {
               const selId = answers[i];
               const correct = selId && q.options.find((o) => o.id === selId)?.is_correct;
@@ -286,10 +334,10 @@ export default function PracticePage() {
                 <div
                   key={q.id}
                   style={{
-                    background: "#fff",
+                    background: "#ffffff",
                     borderRadius: "12px",
-                    padding: "14px 16px",
-                    border: `1.5px solid ${correct ? "#bbf7d0" : "#fca5a5"}`,
+                    padding: "14px 18px",
+                    border: `1px solid ${correct ? "#6ee7b7" : "#fca5a5"}`,
                     display: "flex",
                     gap: "12px",
                     alignItems: "flex-start",
@@ -297,19 +345,21 @@ export default function PracticePage() {
                 >
                   <span
                     style={{
-                      fontSize: "16px",
+                      fontSize: "14px",
+                      fontWeight: 700,
                       flexShrink: 0,
                       marginTop: "2px",
+                      color: correct ? "#059669" : "#dc2626",
                     }}
                   >
-                    {correct ? "✅" : "❌"}
+                    {correct ? "✓" : "✗"}
                   </span>
                   <p
                     style={{
                       margin: 0,
                       fontSize: "14px",
-                      color: "#374151",
-                      lineHeight: 1.6,
+                      color: "#4a5568",
+                      lineHeight: 1.65,
                     }}
                   >
                     {q.body}
@@ -328,44 +378,46 @@ export default function PracticePage() {
     <main
       style={{
         minHeight: "100vh",
-        background: "#f6f7fb",
-        padding: "32px 20px 80px",
-        fontFamily: "'Inter', 'Noto Sans TC', system-ui, sans-serif",
+        background: "#faf8f5",
+        padding: "36px 20px 96px",
+        fontFamily: "var(--font-body)",
       }}
     >
       <div style={{ maxWidth: "720px", margin: "0 auto" }}>
 
         <HomeButton />
         <AuthButton />
-        {/* Progress bar */}
+
+        {/* Progress */}
         <div style={{ marginBottom: "28px" }}>
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: "8px",
+              marginBottom: "10px",
             }}
           >
-            <span style={{ fontSize: "13px", fontWeight: 600, color: "#374151" }}>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: "#4a5568" }}>
               第 {idx + 1} 題
             </span>
-            <span style={{ fontSize: "13px", color: "#9ca3af" }}>
+            <span style={{ fontSize: "13px", color: "#8896a4" }}>
               {answeredCount} / {total} 已答
             </span>
           </div>
           <div
             style={{
-              height: "5px",
-              background: "#e5e7eb",
-              borderRadius: "3px",
+              height: "4px",
+              background: "#e8e4df",
+              borderRadius: "2px",
+              overflow: "hidden",
             }}
           >
             <div
               style={{
-                height: "5px",
-                background: "#2563eb",
-                borderRadius: "3px",
+                height: "4px",
+                background: "#1e2a4a",
+                borderRadius: "2px",
                 width: `${((idx + 1) / total) * 100}%`,
                 transition: "width 0.3s ease",
               }}
@@ -376,47 +428,45 @@ export default function PracticePage() {
         {/* Question card */}
         <div
           style={{
-            background: "#fff",
-            borderRadius: "16px",
+            background: "#ffffff",
+            borderRadius: "20px",
             padding: "28px",
-            boxShadow: "0 2px 8px rgba(15,23,42,0.07)",
+            border: "1px solid #e8e4df",
+            boxShadow: "0 4px 16px rgba(30, 42, 74, 0.07)",
             marginBottom: "16px",
           }}
         >
-          {/* Difficulty badge */}
-          {current.difficulty && DIFFICULTY_LABEL[current.difficulty] && (
+          {current.difficulty && DIFF_LABEL[current.difficulty] && (
             <span
               style={{
                 display: "inline-block",
-                background: DIFFICULTY_BG[current.difficulty] ?? "#f9fafb",
-                color: DIFFICULTY_COLOR[current.difficulty] ?? "#6b7280",
+                background: DIFF_BG[current.difficulty] ?? "#f7f8fa",
+                color: DIFF_COLOR[current.difficulty] ?? "#4a5568",
                 fontSize: "11px",
                 fontWeight: 700,
-                padding: "3px 9px",
+                padding: "3px 10px",
                 borderRadius: "999px",
-                marginBottom: "14px",
+                marginBottom: "16px",
                 letterSpacing: "0.04em",
               }}
             >
-              {DIFFICULTY_LABEL[current.difficulty]}
+              {DIFF_LABEL[current.difficulty]}
             </span>
           )}
 
-          {/* Question body */}
           <p
             style={{
-              margin: "0 0 22px",
-              fontSize: "16px",
-              color: "#111827",
+              margin: "0 0 24px",
+              fontSize: "17px",
+              color: "#1a1f2e",
               lineHeight: 1.75,
-              fontWeight: 500,
+              fontWeight: 600,
             }}
           >
             {current.body}
           </p>
 
-          {/* Options */}
-          <div style={{ display: "grid", gap: "10px" }}>
+          <div style={{ display: "grid", gap: "9px" }}>
             {(current.options ?? []).map((opt) => {
               const icon = optIcon(opt);
               return (
@@ -429,26 +479,13 @@ export default function PracticePage() {
                 >
                   <span style={{ display: "flex", gap: "10px", alignItems: "baseline" }}>
                     {opt.label && (
-                      <span
-                        style={{
-                          fontWeight: 700,
-                          flexShrink: 0,
-                          minWidth: "18px",
-                          color: "inherit",
-                        }}
-                      >
+                      <span style={{ fontWeight: 700, flexShrink: 0, minWidth: "18px", color: "inherit" }}>
                         {opt.label}.
                       </span>
                     )}
                     <span style={{ flex: 1 }}>{opt.text}</span>
                     {icon && (
-                      <span
-                        style={{
-                          flexShrink: 0,
-                          fontWeight: 700,
-                          fontSize: "16px",
-                        }}
-                      >
+                      <span style={{ flexShrink: 0, fontWeight: 700, fontSize: "15px" }}>
                         {icon}
                       </span>
                     )}
@@ -458,22 +495,23 @@ export default function PracticePage() {
             })}
           </div>
 
-          {/* Inline feedback */}
           {isAnswered && (
             <div
               style={{
                 marginTop: "20px",
-                padding: "12px 16px",
+                padding: "13px 16px",
                 borderRadius: "10px",
-                background: current.options.find((o) => o.id === selectedId)
-                  ?.is_correct
-                  ? "#f0fdf4"
+                background: current.options.find((o) => o.id === selectedId)?.is_correct
+                  ? "#ecfdf5"
                   : "#fef2f2",
                 color: current.options.find((o) => o.id === selectedId)?.is_correct
-                  ? "#15803d"
+                  ? "#065f46"
                   : "#dc2626",
                 fontSize: "14px",
                 fontWeight: 600,
+                border: current.options.find((o) => o.id === selectedId)?.is_correct
+                  ? "1px solid #6ee7b7"
+                  : "1px solid #fca5a5",
               }}
             >
               {current.options.find((o) => o.id === selectedId)?.is_correct
@@ -482,11 +520,10 @@ export default function PracticePage() {
             </div>
           )}
 
-          {/* Student tagging */}
           <QuestionTagSelector questionId={current.id} />
         </div>
 
-        {/* Next / Finish button */}
+        {/* Next / Finish */}
         {isAnswered && (
           <button
             onClick={handleNext}
@@ -495,11 +532,11 @@ export default function PracticePage() {
             style={{
               display: "block",
               width: "100%",
-              padding: "15px",
+              padding: "16px",
               borderRadius: "12px",
               border: "none",
-              background: nextHovered ? "#1d4ed8" : "#2563eb",
-              color: "#fff",
+              background: nextHovered ? "#2d3f6e" : "#1e2a4a",
+              color: "#ffffff",
               fontSize: "15px",
               fontWeight: 700,
               cursor: "pointer",
