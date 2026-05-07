@@ -217,6 +217,24 @@ export default function QuestionCard({ question }: { question: any }) {
         }}
       >
         <div style={{ flex: 1, minWidth: "240px" }}>
+          {question.group_title && (
+            <div style={{ marginBottom: "8px" }}>
+              <span
+                style={{
+                  display: "inline-block",
+                  background: "#fef9c3",
+                  color: "#854d0e",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  padding: "3px 8px",
+                  borderRadius: "6px",
+                  letterSpacing: "0.03em",
+                }}
+              >
+                題組：{question.group_title}
+              </span>
+            </div>
+          )}
           <div
             style={{
               fontSize: "12px",

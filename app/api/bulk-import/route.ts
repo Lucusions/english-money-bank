@@ -30,7 +30,14 @@ const CATEGORY_MAP: Record<string, string> = {
 };
 
 interface RawItem {
-  question: { body: string; type?: string; difficulty?: string };
+  question: {
+    body: string;
+    type?: string;
+    difficulty?: string;
+    group_id?: string;
+    group_title?: string;
+    group_order?: number;
+  };
   options: { text: string; is_correct: boolean }[];
   tags?: { name: string; category: string }[];
 }
@@ -89,6 +96,9 @@ async function importOne(item: RawItem, index: number): Promise<{ ok: boolean; e
       body: item.question.body.trim(),
       type: item.question.type ?? "single",
       difficulty: item.question.difficulty ?? "medium",
+      group_id: item.question.group_id ?? null,
+      group_title: item.question.group_title ?? null,
+      group_order: item.question.group_order ?? null,
     })
     .select("id")
     .single();
