@@ -23,6 +23,13 @@ const CARDS = [
     desc: "貼上考試文字，自動解析題目並匯入題庫。",
     cta: "前往匯入",
   },
+  {
+    href: "/bulk-import",
+    icon: "🗂️",
+    title: "JSON 批次匯入",
+    desc: "上傳 JSON 檔案，批次匯入大量題目至題庫。",
+    cta: "JSON 批次匯入",
+  },
 ];
 
 export default function Home() {
