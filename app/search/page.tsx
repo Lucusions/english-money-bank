@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import QuestionCard from "../../components/QuestionCard";
+import ReadingGroupCard from "../../components/ReadingGroupCard";
 import HomeButton from "../../components/HomeButton";
 import AuthButton from "../../components/AuthButton";
 
@@ -12,6 +13,31 @@ export default function SearchPage() {
   const [searched, setSearched] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [btnHovered, setBtnHovered] = useState(false);
+
+  const renderItems = useMemo(() => {
+    const seen = new Set<string>();
+    const groupMap = new Map<string, any[]>();
+
+    for (const q of questions) {
+      if (q.group_id) {
+        if (!groupMap.has(q.group_id)) groupMap.set(q.group_id, []);
+        groupMap.get(q.group_id)!.push(q);
+      }
+    }
+
+    const items: Array<{ type: "single"; question: any } | { type: "group"; groupId: string; questions: any[] }> = [];
+
+    for (const q of questions) {
+      if (!q.group_id) {
+        items.push({ type: "single", question: q });
+      } else if (!seen.has(q.group_id)) {
+        seen.add(q.group_id);
+        items.push({ type: "group", groupId: q.group_id, questions: groupMap.get(q.group_id)! });
+      }
+    }
+
+    return items;
+  }, [questions]);
 
   async function handleSearch() {
     try {
@@ -223,9 +249,13 @@ export default function SearchPage() {
             </div>
           )}
 
-          {questions.map((q) => (
-            <QuestionCard key={q.id} question={q} />
-          ))}
+          {renderItems.map((item) =>
+            item.type === "single" ? (
+              <QuestionCard key={item.question.id} question={item.question} />
+            ) : (
+              <ReadingGroupCard key={item.groupId} questions={item.questions} />
+            )
+          )}
         </div>
       </div>
     </main>
