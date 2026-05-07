@@ -18,9 +18,17 @@ export default function LoginPage() {
   const [inputFocus, setInputFocus] = useState<string | null>(null);
   const [btnHovered, setBtnHovered] = useState(false);
 
+  function isValidEmail(v: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+  }
+
   async function handleSubmit() {
     if (!email || !password) {
       setError("請填入 Email 與密碼");
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setError("請輸入有效的 Email 格式");
       return;
     }
     setLoading(true);
@@ -173,7 +181,9 @@ export default function LoginPage() {
               Email
             </label>
             <input
-              type="email"
+              type="text"
+              inputMode="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onFocus={() => setInputFocus("email")}
