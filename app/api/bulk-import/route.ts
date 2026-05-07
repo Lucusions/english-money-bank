@@ -130,6 +130,26 @@ async function importOne(item: RawItem, index: number): Promise<{ ok: boolean; e
 }
 
 export async function POST(req: NextRequest) {
+  const token = req.headers.get("authorization")?.replace(/^Bearer\s+/, "");
+  if (!token) {
+    return NextResponse.json({ error: "未授權" }, { status: 403 });
+  }
+
+  const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+  if (authErr || !user) {
+    return NextResponse.json({ error: "未授權" }, { status: 403 });
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin") {
+    return NextResponse.json({ error: "權限不足" }, { status: 403 });
+  }
+
   let items: unknown;
   try {
     items = await req.json();

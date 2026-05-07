@@ -1,7 +1,11 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import AuthButton from "../components/AuthButton";
+import { getSupabaseBrowser } from "../lib/supabase-browser";
 
-const CARDS = [
+const BASE_CARDS = [
   {
     href: "/search",
     icon: "🔍",
@@ -23,16 +27,36 @@ const CARDS = [
     desc: "貼上考試文字，自動解析題目並匯入題庫。",
     cta: "前往匯入",
   },
-  {
-    href: "/bulk-import",
-    icon: "🗂️",
-    title: "JSON 批次匯入",
-    desc: "上傳 JSON 檔案，批次匯入大量題目至題庫。",
-    cta: "JSON 批次匯入",
-  },
 ];
 
+const ADMIN_CARD = {
+  href: "/bulk-import",
+  icon: "🗂️",
+  title: "JSON 批次匯入",
+  desc: "上傳 JSON 檔案，批次匯入大量題目至題庫。",
+  cta: "JSON 批次匯入",
+};
+
 export default function Home() {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowser();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.role === "admin") setIsAdmin(true);
+        });
+    });
+  }, []);
+
+  const cards = isAdmin ? [...BASE_CARDS, ADMIN_CARD] : BASE_CARDS;
+
   return (
     <main
       style={{
@@ -99,7 +123,7 @@ export default function Home() {
           maxWidth: "860px",
         }}
       >
-        {CARDS.map((card) => (
+        {cards.map((card) => (
           <div
             key={card.href}
             style={{

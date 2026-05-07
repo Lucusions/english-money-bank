@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { getSupabaseBrowser } from "../../lib/supabase-browser";
 
 interface FailedItem {
   index: number;
@@ -42,9 +43,21 @@ export default function BulkImportPage() {
     setStatus("importing");
 
     try {
+      const supabase = getSupabaseBrowser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) {
+        setApiError("請先登入");
+        setStatus("error");
+        return;
+      }
+
       const res = await fetch("/api/bulk-import", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
         body: JSON.stringify(parsed),
       });
       const json = await res.json();
