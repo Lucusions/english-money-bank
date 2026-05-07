@@ -30,19 +30,25 @@ export default function AuthButton() {
         style={{
           display: "inline-flex",
           alignItems: "center",
-          gap: "5px",
-          padding: "7px 14px",
+          padding: "7px 16px",
           borderRadius: "8px",
-          background: "#2563eb",
+          background: "#1e2a4a",
           color: "#ffffff",
           fontSize: "13px",
           fontWeight: 600,
           textDecoration: "none",
-          boxShadow: "0 1px 6px rgba(15, 23, 42, 0.18)",
+          boxShadow: "0 2px 8px rgba(30, 42, 74, 0.20)",
           letterSpacing: "0.01em",
+          transition: "background 0.12s",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.background = "#2d3f6e";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.background = "#1e2a4a";
         }}
       >
-        {isLoggedIn ? "👤 我的帳號" : "登入 / 註冊"}
+        {isLoggedIn ? "我的帳號" : "登入 / 註冊"}
       </Link>
     </div>
   );

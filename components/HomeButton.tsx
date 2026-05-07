@@ -11,23 +11,26 @@ export default function HomeButton() {
           display: "inline-flex",
           alignItems: "center",
           gap: "6px",
-          color: "#6b7280",
-          fontSize: "14px",
-          fontWeight: 500,
+          color: "#8896a4",
+          fontSize: "13px",
+          fontWeight: 600,
           textDecoration: "none",
-          padding: "6px 12px",
+          padding: "6px 13px",
           borderRadius: "8px",
-          background: "#f3f4f6",
-          border: "1px solid #e5e7eb",
+          background: "#f0ede8",
+          border: "1px solid #e8e4df",
+          letterSpacing: "0.01em",
           transition: "background 0.12s, color 0.12s",
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLAnchorElement).style.background = "#e5e7eb";
-          (e.currentTarget as HTMLAnchorElement).style.color = "#111827";
+          const el = e.currentTarget as HTMLAnchorElement;
+          el.style.background = "#e8e4df";
+          el.style.color = "#1e2a4a";
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLAnchorElement).style.background = "#f3f4f6";
-          (e.currentTarget as HTMLAnchorElement).style.color = "#6b7280";
+          const el = e.currentTarget as HTMLAnchorElement;
+          el.style.background = "#f0ede8";
+          el.style.color = "#8896a4";
         }}
       >
         ← 回首頁

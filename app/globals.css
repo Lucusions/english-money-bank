@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -12,15 +7,107 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─────────────────────────────────────────────
+   Design Tokens
+   ───────────────────────────────────────────── */
+:root {
+  /* Brand */
+  --navy:      #1e2a4a;
+  --navy-700:  #2d3f6e;
+  --navy-400:  #4a5872;
+  --navy-200:  #8896b8;
+  --gold:      #c9a84c;
+  --gold-200:  #f5e6c8;
+  --gold-50:   #fdf8ee;
+
+  /* Surfaces */
+  --ivory:       #faf8f5;
+  --ivory-dark:  #f0ede8;
+  --surface:     #ffffff;
+  --surface-2:   #f7f8fa;
+  --surface-3:   #f2f4f8;
+
+  /* Text */
+  --text-1: #1a1f2e;
+  --text-2: #4a5568;
+  --text-3: #8896a4;
+  --text-4: #b4bec8;
+
+  /* Borders */
+  --border:       #e8e4df;
+  --border-light: #f0ede8;
+
+  /* Semantic */
+  --success:         #059669;
+  --success-bg:      #ecfdf5;
+  --success-border:  #6ee7b7;
+  --error:           #dc2626;
+  --error-bg:        #fef2f2;
+  --error-border:    #fca5a5;
+  --warning-bg:      #fffbeb;
+  --warning-border:  #fde68a;
+
+  /* Blue accent */
+  --blue:       #3b6fd4;
+  --blue-hover: #2d5db8;
+  --blue-light: #eef2fb;
+  --blue-border: #c7d9f5;
+
+  /* Purple (teacher) */
+  --purple:        #7c3aed;
+  --purple-hover:  #6d28d9;
+  --purple-light:  #f5f3ff;
+  --purple-border: #ede9fe;
+  --purple-muted:  #c4b5fd;
+
+  /* Radius */
+  --r-xs:  4px;
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  16px;
+  --r-xl:  20px;
+  --r-2xl: 28px;
+  --r-full: 999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(30, 42, 74, 0.05);
+  --shadow-sm: 0 2px 6px rgba(30, 42, 74, 0.07);
+  --shadow-md: 0 4px 16px rgba(30, 42, 74, 0.09);
+  --shadow-lg: 0 12px 32px rgba(30, 42, 74, 0.11);
+  --shadow-xl: 0 20px 48px rgba(30, 42, 74, 0.14);
+
+  /* Typography */
+  --font-display: var(--font-playfair), Georgia, 'Times New Roman', serif;
+  --font-body:    var(--font-geist-sans), 'Noto Sans TC', -apple-system, system-ui, sans-serif;
+
+  /* Transitions */
+  --t-fast:   0.12s ease;
+  --t-normal: 0.2s ease;
+  --t-slow:   0.3s ease;
+}
+
+/* ─────────────────────────────────────────────
+   Base
+   ───────────────────────────────────────────── */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  color: var(--text-1);
+  background: var(--ivory);
+  line-height: 1.6;
 }
+
+/* ─────────────────────────────────────────────
+   Custom Scrollbar
+   ───────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
